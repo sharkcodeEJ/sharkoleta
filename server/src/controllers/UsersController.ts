@@ -1,7 +1,7 @@
-import { User } from '@entities/User';
+import { User } from '@entities/User'
 
 export class UsersController {
-    teste() {
-        const user = new User();
-    }
+  teste () {
+    const user = new User()
+  }
 }
