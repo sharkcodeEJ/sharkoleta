@@ -2,10 +2,11 @@
   "compilerOptions": {
     "target": "es2017",                                
     "module": "commonjs",
-    "lib": ["es6"],
+    "lib": ["es6", "ESNext"],
     "allowJs": true,
+    "sourceMap": true,
     "outDir": "./dist",                              
-    "rootDir": "./src",                             
+    "rootDir": "./src",
     "typeRoots": [
       "./node_modules/@types",
       "./src/@types"
@@ -21,7 +22,10 @@
       "@controllers/*": ["./src/controllers/*"],
       "@entities/*": ["./src/entities/*"],
       "@views/*": ["./src/views/*"],
-      "@config/*": ["./src/configs/*"]
+      "@config/*": ["./src/configs/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@repository/*": ["./src/repositories/*"],
+      "@repository-impl/*": ["./src/repositories/prisma/*"]
     }
   },
   "include": [
