@@ -1,5 +1,5 @@
 import { IUsersRepositories } from '@repository/IUsersRepositories'
-import { prisma } from '../../database/client'
+import { prisma } from '@database/client'
 import { User } from '@entities/User'
 
 class PrismaUsersRepository implements IUsersRepositories {

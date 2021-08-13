@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { createUserFactory } from '@modules/CreateUser/CreateUerFactory'
+import { createUserController } from '@modules/CreateUser'
 
 const routes = Router()
 
 routes.post('/users', (request, response) => {
-  return createUserFactory().handle(request, response)
+  return createUserController.handle(request, response)
 })
 
 export { routes }
