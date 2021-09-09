@@ -18,7 +18,7 @@ model point {
   latitude  Decimal
   longitude Decimal
   city      String
-  uf        String  @db.VarChar(2)
+  uf        String
   address   String
   district  String
   number    Int
