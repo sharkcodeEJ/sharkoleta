@@ -1,5 +1,5 @@
 class Item {
-  id?: number;
+  id: number;
   title: string;
   image: string;
 }

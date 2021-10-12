@@ -9,7 +9,9 @@ class PrismaPointsRepository implements IPointsRepositories {
         id,
         name,
         email,
+        description,
         whatsapp,
+        fone,
         latitude,
         longitude,
         city,
@@ -17,7 +19,11 @@ class PrismaPointsRepository implements IPointsRepositories {
         address,
         district,
         number,
-        image
+        image,
+        cep,
+        itens: {
+          connect: itens
+        }
       }
     })
   }

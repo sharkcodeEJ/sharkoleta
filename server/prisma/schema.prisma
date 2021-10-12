@@ -10,17 +10,28 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model item {
+  id     Int     @id
+  title  String
+  image  String
+  points point[] @relation(references: [id])
+}
+
 model point {
-  id        String  @id @default(uuid())
-  name      String
-  email     String
-  whatsapp  String
-  latitude  Decimal
-  longitude Decimal
-  city      String
-  uf        String
-  address   String
-  district  String
-  number    Int
-  image     String
+  id          String  @id @default(uuid())
+  name        String
+  email       String
+  description String
+  whatsapp    String
+  fone        String
+  latitude    Decimal
+  longitude   Decimal
+  city        String
+  uf          String
+  address     String
+  district    String
+  number      Int
+  cep         String
+  image       String
+  itens       item[]  @relation(references: [id])
 }
