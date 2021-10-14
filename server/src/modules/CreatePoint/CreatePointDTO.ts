@@ -1,7 +1,7 @@
 interface IItemCreatePointRequestDTO {
   id: number;
-  title?: string,
-  image?: string;
+  title: string,
+  image: string;
 }
 
 interface ICreatePointResquestDTO {

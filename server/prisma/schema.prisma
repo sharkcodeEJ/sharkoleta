@@ -10,15 +10,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model item {
-  id     Int     @id
+model Item {
+  id     Int         @id
   title  String
   image  String
-  points point[] @relation(references: [id])
+  points PointItem[]
 }
 
-model point {
-  id          String  @id @default(uuid())
+model Point {
+  id          String      @id @db.Uuid
   name        String
   email       String
   description String
@@ -33,5 +33,14 @@ model point {
   number      Int
   cep         String
   image       String
-  itens       item[]  @relation(references: [id])
+  itens       PointItem[]
+}
+
+model PointItem {
+  point   Point  @relation(fields: [pointId], references: [id])
+  item    Item   @relation(fields: [itemId], references: [id])
+  pointId String @db.Uuid
+  itemId  Int
+
+  @@id([pointId, itemId])
 }

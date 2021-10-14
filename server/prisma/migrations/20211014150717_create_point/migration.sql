@@ -1,6 +1,6 @@
 -- CreateTable
-CREATE TABLE "point" (
-    "id" TEXT NOT NULL,
+CREATE TABLE "Point" (
+    "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "description" TEXT NOT NULL,
