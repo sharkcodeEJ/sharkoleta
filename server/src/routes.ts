@@ -1,10 +1,20 @@
 import { Router } from 'express'
-import { createUserController } from '@modules/CreateUser'
+import { createPointsController } from '@modules/CreatePoint'
+import { findByIdPointController } from '@modules/FindByIdPoint'
+import { filterPointsController } from '@modules/FilterPoints'
 
 const routes = Router()
 
-routes.post('/users', (request, response) => {
-  return createUserController.handle(request, response)
+routes.post('/points', (request, response) => {
+  return createPointsController.handle(request, response)
+})
+
+routes.get('/points/:id', (request, response) => {
+  return findByIdPointController.handle(request, response)
+})
+
+routes.get('/points', (request, response) => {
+  return filterPointsController.handle(request, response)
 })
 
 export { routes }
