@@ -1,14 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Search from './pages/Search'
+import Map from './pages/Map'
+import Place from './pages/Place'
+import { color } from 'react-native-reanimated';
 
 export default function App() {
+
+  const Stack = createStackNavigator();
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  
+      <NavigationContainer>
+        
+          <Stack.Navigator>
+
+            <Stack.Screen name="Search" component={Search} options={{
+                headerShown: false
+              }}/>
+            <Stack.Screen name="Map" component={Map} options={{
+              headerStyle: {
+                backgroundColor: '#2AC28B',
+                shadowRadius: 0,
+                shadowColor: 'transparent',
+                elevation: 0,
+                shadowOpacity: 0,
+              },
+              headerTintColor: 'white',
+              title : "",
+
+            }}/>
+            <Stack.Screen name="Place" component={Place} options={{
+              headerStyle: {
+                backgroundColor: '#2AC28B',
+                shadowRadius: 0,
+                shadowColor: 'transparent',
+                elevation: 0,
+                shadowOpacity: 0,
+              },
+              headerTintColor: 'white',
+              title: "",
+            }}/>
+
+          </Stack.Navigator>
+      </NavigationContainer>
+  
+    );
 }
 
 const styles = StyleSheet.create({
