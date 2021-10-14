@@ -10,8 +10,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id    String @id @default(uuid())
-  name  String
-  email String @unique
+model point {
+  id        String  @id @default(uuid())
+  name      String
+  email     String
+  whatsapp  String
+  latitude  Decimal
+  longitude Decimal
+  city      String
+  uf        String  @db.VarChar(2)
+  address   String
+  district  String
+  number    Int
+  image     String
 }
