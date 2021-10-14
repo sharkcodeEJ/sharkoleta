@@ -1,0 +1,13 @@
+.inputs-form-hover input{
+    border:2px solid transparent
+}
+
+.inputs-form-hover:hover label{
+    color:#2AC28B;
+    transition: all .1s;
+}
+
+.inputs-form-hover:hover input, .inputs-form-hover input:focus {
+    border-color: #2AC28B;
+    transition: all .5s;
+}
