@@ -13,10 +13,14 @@ module.exports = {
   plugins: [
     ['module-resolver', {
       alias: {
-        '@config': './src/config',
-        '@entities': './src/entities',
-        '@controllers': './src/controllers',
-        '@views': './src/views'
+        "@controllers": "./src/controllers",
+        "@entities": "./src/entities",
+        "@views": "./src/views",
+        "@config": "./src/configs",
+        "@modules": "./src/modules",
+        "@database": "./src/database",
+        "@repository": "./src/repositories",
+        "@repository-impl": "./src/repositories/prisma",
       }
     }]
   ],
