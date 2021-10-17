@@ -1,13 +1,50 @@
+body{
+    background: #2AC28B;
+}
+
+input{
+    color: rgb(50,50,50);
+    font-family: 'Poppins', sans-serif;
+}
+
+.container{
+    background-image: url('background.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.select-card{
+    border: 3px solid rgb(0,0,0,0);
+    cursor: pointer;
+    transition: all .5s;
+}
+.select-card:hover{
+    border-color: #2ac28b;
+}
+
+.button-submit{
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: background .5s;
+}
+
+.button-submit:hover{
+    background: #209268;
+}
+
+.inputs-form-hover label,input{
+    transition: all .5s;
+}
+
 .inputs-form-hover input{
     border:2px solid transparent
 }
 
 .inputs-form-hover:hover label{
     color:#2AC28B;
-    transition: all .1s;
 }
 
 .inputs-form-hover:hover input, .inputs-form-hover input:focus {
     border-color: #2AC28B;
-    transition: all .5s;
 }

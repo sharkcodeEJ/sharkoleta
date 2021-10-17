@@ -1,4 +1,6 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
+import Axios from 'axios';
+
 import { 
     Container, 
     Input,
@@ -16,16 +18,164 @@ import {
     InputGroup,
     InputRightElement,
     Heading,
-    AspectRatio
- } from "@chakra-ui/react"
+    Spinner,
+    MenuList,
+    Menu,
+    MenuItem,
+    MenuButton
+ } from "@chakra-ui/react";
 
-import {DownloadIcon,ArrowBackIcon,SearchIcon} from "@chakra-ui/icons"
+ import {Map,Marker,TileLayer,Popup} from 'react-leaflet';
+
+import {DownloadIcon,ArrowBackIcon,SearchIcon,HamburgerIcon} from "@chakra-ui/icons"
 import ImagemLampadas from './imgs/lampadas.svg';
 import ImagemPilhas from './imgs/baterias.svg';
 import ImagemEletronicos from './imgs/eletronicos.svg';
+import Local from '../dadosColeta/imgs/Group.svg';
+import Us from './imgs/us.svg'
+import Home from './imgs/home.svg'
+import Search from './imgs/search.svg'
+
+export function ComponentCadastro(props){
+    const classes = {
+        selectedItem:{
+            border:'3px solid #2AC28B',
+            transform:'scale(1.02)'
+        }
+    }
+
+    const [loaders, setLoaders] = useState({
+        searchCEP:false,
+        searchPosition:false
+    });
+    const [position, setPosition] = useState([-28.4781703,-49.1820172]);
+    const [zoom, setZoom] = useState(13);
+    const [endereco, setEndereco] = useState({
+        rua:null,
+        bairro:null,
+        numero:null,
+        cidade:null,
+        uf:null,
+        cep:null
+    });
+    const [dados, setDados] = useState({
+        nome:null,
+        email:null,
+        numero:null
+    });
+
+    const [itensSelected, setItensSelected] = useState({
+        lampadas:false,
+        pilhas:false,
+        residuos:false
+    });
 
 
-export function componentConcluido(props){
+    function getLocationPoint(){
+        try{
+            setLoaders({
+                ...loaders,
+                searchPosition:true
+            });
+
+            window.navigator.geolocation.getCurrentPosition(resolve =>{
+                const {latitude,longitude} = resolve.coords; 
+                setPosition([latitude,longitude]);
+                Axios
+                    .get(`https://nominatim.openstreetmap.org/reverse?lat=${
+                        latitude
+                    }&lon=${
+                        longitude
+                    }&addressdetails=1&format=json`)
+                .then(resolve => {
+                    const {data} = resolve;
+                    setEndereco({
+                        ...endereco,
+                        cidade: data.address.city,
+                        rua: data.address.road,
+                        uf: data.address.state,
+                        bairro: data.address.suburb,
+                        cep: data.address.postcode,
+                    });
+
+                    setLoaders({
+                        ...loaders,
+                        searchPosition:false
+                    });
+                });
+            });
+        }catch(error){
+            setLoaders({
+                ...loaders,
+                searchPosition:false
+            });
+
+            console.log(error);
+        }
+    }
+
+    async function getCEP(){
+        try{
+            setLoaders({
+                ...loaders,
+                searchCEP:true
+            });
+
+            const { data:response } = await Axios
+                .get(`https://viacep.com.br/ws/${endereco.cep}/json/`)
+
+            const { data: responsePositionCode} = await Axios
+                .get(`https://nominatim.openstreetmap.org/search?street=${
+                    `${response.logradouro}` 
+                    }&city=${
+                        response.localidade
+                    }&state=${
+                        response.uf
+                    }&postalcode=${
+                        endereco.cep
+                    }&format=json&limit=1`
+                )
+    
+            setEndereco({
+                ...endereco,
+                rua: response.logradouro,
+                bairro: response.bairro,
+                numero: response.siafi,
+                cidade: response.localidade,
+                uf: response.uf
+            });
+
+           setPosition([
+                responsePositionCode[0].lat,
+                responsePositionCode[0].lon,
+            ]);
+
+            setLoaders({
+                ...loaders,
+                searchCEP:false
+            });
+
+        }catch(error){
+            setLoaders({
+                ...loaders,
+                searchPosition:false
+            });
+            console.log(error.message)
+        }
+    }
+
+    function formatNumber(strNumber){
+        if(!typeof strNumber === 'string') return;
+
+        const length = strNumber.length;
+
+        if(length === 2)
+            return `(${strNumber.charAt(0)}${strNumber.charAt(1)}) `
+
+        if(length === 9){
+            return `${strNumber.substring(-9)} - ${strNumber.substring(9)}`
+        }
+    }
 
     return (
         <Container 
@@ -33,30 +183,105 @@ export function componentConcluido(props){
             alignItems='center'
             justifyContent='flex-start'
             maxWidth='lg'
-            background='#2AC28B'
             centerContent={true}
+            className='container'
         >
             <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='space-between'
                 width='100%'
                 background='#219653'
                 position='fixed'
                 top='0px'
+                padding='5px'
                 zIndex={1000}
             >
-                <Button
-                    leftIcon={<ArrowBackIcon width='25px' height='auto'/>}
-                    variant="solid"
-                    padding='25px'
-                    background='transparent'
+               <Menu>
+                    <MenuButton
+                        as={IconButton}
+                        aria-label="Options"
+                        icon={<HamburgerIcon width='25px' height='auto'/>}
+                        variant="outline"
+                        padding='20px'
+                        margin='0px 0px 0px 50px'
+                        background='transparent'
+                        cursor='pointer'
+                        color='#FFF'
+                        border='2px solid #49d085'
+                        transition='all .2s'
+                        _hover={{
+                            background:'rgb(0,0,0,0.3)'
+                        }}
+                    />
+                    <MenuList 
+                        maxWidth='500px' 
+                        minWidth='300px' 
+                        width='400px'
+                        background='#1a653c'
+                        color='#d6f5e4'
+                        //fontWeight='400'
+                        fontSize='18px'
+                        
+                    >
+                        <MenuItem 
+                            padding='20px' 
+                            fontWeight='550' 
+                            fontSize='inherit'
+                            letterSpacing='2px'
+                            background='inherit'
+                            transition='all .2s'
+                            cursor='pointer'
+                            _hover={{
+                                background:'#e6e6e6',
+                                color:'#1a653c'
+                            }}
+                        >
+                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Home}/>
+                            Inicio
+                        </MenuItem>
+                        <MenuItem 
+                            padding='20px' 
+                            background='inherit' 
+                            fontWeight='550' 
+                            letterSpacing='2px'
+                            fontSize='inherit'
+                            cursor='pointer'
+                            _hover={{
+                                background:'#e6e6e6',
+                                color:'#1a653c'
+                            }}
+                        >
+                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Us}/>
+                            Junte-se a nos
+                        </MenuItem>
+                        <MenuItem  
+                            padding='20px' 
+                            background='inherit' 
+                            fontWeight='550' 
+                            letterSpacing='2px'
+                            fontSize='inherit'
+                            cursor='pointer'
+                            _hover={{
+                                background:'#e6e6e6',
+                                color:'#1a653c'
+                            }}
+                        >
+                            <Image margin ='0px 40px 0px 0px' color='#FFF' src={Search}/>
+                            Localizar
+                        </MenuItem>
+                    </MenuList>
+                </Menu>
+                <Text
                     fontSize='25px'
-                    color='#fff'
+                    color='#e6e6e6'
                     fontFamily={`'Ubuntu', sans-serif`}
                     fontWeight='bolder'
+                    margin='0px 40px 0px 0px'
                 >
-                    Home
-                </Button>
+                    Cadastro de ponto
+                </Text>
             </Box>
-                
             <Center
                 display='block'
                 padding='100px'
@@ -98,7 +323,7 @@ export function componentConcluido(props){
                                 fontFamily={` 'Ubuntu', sans-serif`}
                                 margin='0px 0px 30px 0px'
                             >
-                                Dados
+                                Informações pessoais
                             </Text>
                             <FormControl
                                 display='block'
@@ -118,9 +343,13 @@ export function componentConcluido(props){
                                         background='#F0F0F5'
                                         width='100%'
                                         height='50px'
+                                        value={dados.nome}
                                         borderRadius='15px'
+                                        onInput={(e)=> setDados({...dados, nome: e.target.value})}
                                         padding='20px'
                                         boxSizing='border-box'
+                                        className='dados-form'
+                                        id='nome-entidade'
                                     />
                             </FormControl>
                             <FormControl
@@ -145,12 +374,13 @@ export function componentConcluido(props){
                                         borderRadius='15px'
                                         padding='20px'
                                         boxSizing='border-box'
-                                        //children={}
-                                        
+                                        onInput={(e)=> setDados({...dados,email:e.target.value})}
+                                        value={dados.email}
                                     />
                             </FormControl>
                             <FormControl
                                 display='block'
+                                maxWidth='30%'
                                 margin='50px 0px 0px 0px'
                                 id='telefone'
                                 className='inputs-form-hover'
@@ -166,13 +396,21 @@ export function componentConcluido(props){
                                         variant="outline" 
                                         type='text'
                                         background='#F0F0F5'
-                                        width='50%'
+                                        width='100%'
                                         height='50px'
                                         borderRadius='15px'
-                                        defaultValue={`(\t)`}
                                         padding='20px'
                                         boxSizing='border-box'
-                                        //children={<span>( )</span>}
+                                        onInput={(e)=> {
+                                            const typeEvent = e.nativeEvent.inputType;
+
+                                            const value = 
+                                                e.target.value.length >= 2 && typeEvent !== "deleteContentBackward"  
+                                                ? formatNumber(e.target.value) : e.target.value
+
+                                            setDados({...dados, numero: value})
+                                        }}
+                                        value={dados.numero}
                                     />
                             </FormControl>
                         </Box>
@@ -184,13 +422,21 @@ export function componentConcluido(props){
                                 fontFamily={` 'Ubuntu', sans-serif`}
                                 margin='0px 0px 30px 0px'
                             >
-                                Endereco
+                                Endereço
                             </Text>
-                            <AspectRatio  height='auto'>
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224450.92494095035!2d-49.18201722145378!3d-28.478170264824826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x952142efba29114d%3A0xb811c0e3c0044343!2sTubar%C3%A3o%20-%20SC!5e0!3m2!1spt-BR!2sbr!4v1626543760241!5m2!1spt-BR!2sbr" 
-                            />
-                            </AspectRatio>
+                            <Box height='500px' position='relative'>
+                                <Map center={position} zoom={zoom} style={{width:`100%`,height:'100%',zIndex:10}}>
+                                    <TileLayer
+                                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <Marker position={position}>
+                                    <Popup>
+                                        Vocë esta aqui!
+                                    </Popup>
+                                    </Marker>
+                                </Map>
+                            </Box>
                             <Stack
                                 spacing='20px'
                                 direction='row'
@@ -198,8 +444,8 @@ export function componentConcluido(props){
                             >
                                 <FormControl
                                     display='block'
-                                    id='numero'
-                                    width='30%'
+                                    id='cidade'
+                                    maxWidth='40%'
                                     className='inputs-form-hover'
                                 >
                                         <FormLabel 
@@ -207,7 +453,7 @@ export function componentConcluido(props){
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
                                         >
-                                            Numero
+                                            Cidade
                                         </FormLabel>
                                         <Input 
                                             variant="outline" 
@@ -218,41 +464,10 @@ export function componentConcluido(props){
                                             borderRadius='15px'
                                             padding='20px'
                                             boxSizing='border-box'
-                                            //children={}
+                                            value={endereco.cidade}
                                             
                                         />
                                 </FormControl>
-                                <FormControl
-                                    display='block'
-                                    id='endereco'
-                                    className='inputs-form-hover'
-                                >
-                                        <FormLabel 
-                                            marginBottom='10px'
-                                            color='#322153'
-                                            fontFamily={`'Poppins', sans-serif`}
-                                        >
-                                            Endereco
-                                        </FormLabel>
-                                        <Input 
-                                            variant="outline" 
-                                            type='text'
-                                            background='#F0F0F5'
-                                            width='100%'
-                                            height='50px'
-                                            borderRadius='15px'
-                                            padding='20px'
-                                            boxSizing='border-box'
-                                            //children={}
-                                            
-                                        />
-                                </FormControl>
-                            </Stack>
-                            <Stack
-                                spacing='20px'
-                                direction='row'
-                                margin='30px 0px 0px 0px'
-                            >
                                 <FormControl
                                     display='block'
                                     id='bairro'
@@ -274,13 +489,70 @@ export function componentConcluido(props){
                                             borderRadius='15px'
                                             padding='20px'
                                             boxSizing='border-box'
-                                            //children={}
+                                            value={endereco.bairro}
                                             
                                         />
                                 </FormControl>
                                 <FormControl
                                     display='block'
-                                    width='40%'
+                                    maxWidth='15%'
+                                    id='numero'
+                                    className='inputs-form-hover'
+                                >
+                                        <FormLabel 
+                                            marginBottom='10px'
+                                            color='#322153'
+                                            fontFamily={`'Poppins', sans-serif`}
+                                        >
+                                            Numero
+                                        </FormLabel>
+                                        <Input 
+                                            variant="outline" 
+                                            type='text'
+                                            background='#F0F0F5'
+                                            width='100%'
+                                            height='50px'
+                                            borderRadius='15px'
+                                            padding='20px'
+                                            boxSizing='border-box'
+                                            value={endereco.numero}
+                                            
+                                        />
+                                </FormControl>
+                            </Stack>
+                            <Stack
+                                spacing='20px'
+                                direction='row'
+                                margin='30px 0px 0px 0px'
+                            >
+                                <FormControl
+                                    display='block'
+                                    id='bairro'
+                                    className='inputs-form-hover'
+                                >
+                                        <FormLabel 
+                                            marginBottom='10px'
+                                            color='#322153'
+                                            fontFamily={`'Poppins', sans-serif`}
+                                        >
+                                            Endereço
+                                        </FormLabel>
+                                        <Input 
+                                            variant="outline" 
+                                            type='text'
+                                            background='#F0F0F5'
+                                            width='100%'
+                                            height='50px'
+                                            borderRadius='15px'
+                                            padding='20px'
+                                            boxSizing='border-box'
+                                            value={endereco.rua}
+                                            
+                                        />
+                                </FormControl>
+                                <FormControl
+                                    display='block'
+                                    maxWidth='25%'
                                     id='cep'
                                     className='inputs-form-hover'
                                 >
@@ -298,12 +570,22 @@ export function componentConcluido(props){
                                                     <IconButton
                                                         background='#2AC28B'
                                                         color='#FFF'
-                                                        padding= '5px'
+                                                        minWidth='20px'
+                                                        minHeight='20px'
+                                                        width='40px'
+                                                        height='40px'
+                                                        maxWidth='50px'
+                                                        maxHeight='50px'
                                                         right='10px'
                                                         borderRadius='5px'
                                                         cursor='pointer'
+                                                        boxSizing='border-box'
+                                                        onClick={()=> getCEP()}
                                                     >
-                                                        <SearchIcon height='20px' width='auto'/>
+                                                        {!loaders.searchCEP 
+                                                            ? (<SearchIcon  height='20px' width='20px'/>)
+                                                            : (<Spinner height='20px' width='20px' color='inherit'/>)}
+                                                        
                                                     </IconButton>
                                                 } 
                                             />
@@ -318,12 +600,42 @@ export function componentConcluido(props){
                                                 paddingRight='50px'
                                                 border='2px solid transparent'
                                                 boxSizing='border-box'
+                                                onInput={(e)=> setEndereco({...endereco, cep: e.target.value})}
+                                                value={endereco.cep}
+
                                             />
                                         </InputGroup>
                                 </FormControl>
-                                
                             </Stack>
-                            
+                            <Stack
+                                spacing='20px'
+                                direction='row'
+                                margin='30px 0px 0px 0px'
+                            >
+                                <Button
+                                   color='#FFF'
+                                   padding='20px 40px'
+                                   maxHeight='50px'
+                                   maxWidth='400px'
+                                   width='300px'
+                                   minWidth='200px'
+                                   borderRadius='10px'
+                                   float='right'
+                                   fontWeight='bolder'
+                                   background='#2F80ED'
+                                   boxSizing='border-box'
+                                   cursor='pointer'
+                                    leftIcon={
+                                        !loaders.searchPosition
+                                        ? (<Image color='inherit' width='20px' height='20px' marginRight='10px' src={Local}/>)
+                                        : (<Spinner thickness="4px" color='inherit' width='20px' height='20px'  marginRight='10px'></Spinner>)
+                                    }
+                                    onClick={getLocationPoint}
+                                >
+                                    Obter localização atual
+                                </Button>
+                            </Stack>
+
                         </Box>
                         <Box>
                             <Center
@@ -336,6 +648,43 @@ export function componentConcluido(props){
                                 height='80%'
                                 borderRadius='10px'
                                 border='3px dashed #2AC28B'
+                                cursor='pointer'
+                                transition='all .5s'
+                                _hover={{
+                                    background:'rgba(150,150,150,0.3)'
+                                }}
+                                onClick={(event)=>{
+                                    const componentParent = event.currentTarget;
+                                    const componentFile = document.createElement('input');
+                                    componentFile.setAttribute('type','file');
+                                    componentFile.click();
+
+                                    componentFile.addEventListener('input', (e)=>{
+                                        const [file] =  e.target.files;
+                                        const readerFile = new FileReader();
+                                        readerFile.readAsText(file);
+
+                                        readerFile.addEventListener('load',(result)=>{
+                                            const componentBackground = document.createElement('div');        
+                                            Object.defineProperty(componentBackground,'style',{
+                                                value: {
+                                                    ...componentBackground.style,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    position: 'absolute',
+                                                    background: 'black' 
+                                                }
+                                            });
+
+                                            componentBackground.innerHTML = result.currentTarget.result;
+                                            componentParent.appendChild(componentBackground);
+                                            
+                                        })
+                                    })
+                                }}
                             >
                                 <Stack
                                     spacing='20px'
@@ -376,8 +725,16 @@ export function componentConcluido(props){
                             <Wrap>
                                 <WrapItem
                                     background='#E1FAEC'
-                                    width='calc(33.33% - 10px)'
+                                    width='calc(33.33% - 20px)'
                                     borderRadius='5px'
+                                    className='select-card'
+                                    style={Boolean(itensSelected.pilhas) ? classes.selectedItem : null}
+                                    onClick={()=>{
+                                        setItensSelected({
+                                            ...itensSelected,
+                                            pilhas: !itensSelected.pilhas
+                                        })
+                                    }}
                                 >
                                     <Center 
                                         width='100%'
@@ -405,8 +762,16 @@ export function componentConcluido(props){
                                 </WrapItem>
                                 <WrapItem
                                      background='#E1FAEC'
-                                     width='calc(33.33% - 10px)'
+                                     width='calc(33.33% - 20px)'
                                      borderRadius='5px'
+                                     className='select-card'
+                                     style={Boolean(itensSelected.lampadas) ? classes.selectedItem : null}
+                                        onClick={()=>{
+                                            setItensSelected({
+                                                ...itensSelected,
+                                                lampadas: !itensSelected.lampadas
+                                            })
+                                        }}
                                 >
                                     <Center
                                         width='100%'
@@ -434,8 +799,16 @@ export function componentConcluido(props){
                                 </WrapItem>
                                 <WrapItem
                                      background='#E1FAEC'
-                                     width='calc(33.33% - 10px)'
+                                     width='calc(33.33% - 20px)'
                                      borderRadius='5px'
+                                     className='select-card'
+                                     style={Boolean(itensSelected.residuos) ? classes.selectedItem : null}
+                                    onClick={()=>{
+                                        setItensSelected({
+                                            ...itensSelected,
+                                            residuos: !itensSelected.residuos
+                                        })
+                                    }}
                                 >
                                     <Center 
                                         width='100%'
@@ -473,6 +846,8 @@ export function componentConcluido(props){
                                 borderRadius='10px'
                                 fontSize='20px'
                                 float='right'
+                                boxShadow='0px 2px 2px 0px rgb(150,150,150)'
+                                className='button-submit'
                             >
                                 Cadastrar ponto de coleta
                             </Button>
@@ -486,4 +861,4 @@ export function componentConcluido(props){
 }
 
 
-export default componentConcluido
+export default ComponentCadastro
