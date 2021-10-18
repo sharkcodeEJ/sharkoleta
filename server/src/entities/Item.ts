@@ -3,7 +3,7 @@ class Item {
   id: number;
   title: string;
   image: string;
-  points: Point[]
+  points?: Point[]
 }
 
 export { Item }

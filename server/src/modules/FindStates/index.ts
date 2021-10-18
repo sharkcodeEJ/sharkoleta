@@ -1,4 +1,4 @@
-import { MokeStatesRepository } from '../../repositories/moke/MokeStatesRepository'
+import { MokeStatesRepository } from '@repository-moke/MokeStatesRepository'
 import { FindStateController } from './FindStateController'
 import { FindStateService } from './FindStatesService'
 

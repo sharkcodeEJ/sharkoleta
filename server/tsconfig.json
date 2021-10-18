@@ -26,7 +26,8 @@
       "@modules/*": ["./src/modules/*"],
       "@database/*": ["./src/database/*"],
       "@repository/*": ["./src/repositories/*"],
-      "@repository-impl/*": ["./src/repositories/prisma/*"]
+      "@repository-impl/*": ["./src/repositories/prisma/*"],
+      "@repository-moke/*": ["./src/repositories/moke/*"]
     }
   },
   "include": [
