@@ -1,0 +1,20 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+
+  server:
+    image: sharkcoleta-server-dev
+    restart: always
+    environment:
+     - PORT=333
+     - DATABASE_URL=postgresql://postgres:mysecretpassword@some-postgres:5432/postgres
+    ports:
+      - 8080:8080
+      
