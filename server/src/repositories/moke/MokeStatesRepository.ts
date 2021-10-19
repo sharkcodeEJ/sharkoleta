@@ -2,8 +2,8 @@ import { State } from '../../entities/State'
 import { IStatesRepositories } from '../IStatesRepositories'
 
 class MokeStatesRepository implements IStatesRepositories {
-  findStates (): State[] {
-    return [
+  findStates ():  Promise<State[]> {
+    return Promise.all([
       {
         name: 'Santa Catarina',
         cities: [
@@ -43,8 +43,8 @@ class MokeStatesRepository implements IStatesRepositories {
           }
         ]
       }
-    ] as State[]
+    ])
   }
-}
+  }
 
 export { MokeStatesRepository }
