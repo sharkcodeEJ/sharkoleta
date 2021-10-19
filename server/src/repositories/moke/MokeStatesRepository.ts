@@ -1,7 +1,6 @@
 import { State } from '../../entities/State'
-import { IStatesRepositories } from '../IStatesRepositories'
-
-class MokeStatesRepository implements IStatesRepositories {
+/*
+class MokeStatesRepository  {
   findStates ():  Promise<State[]> {
     return Promise.all([
       {
@@ -48,3 +47,4 @@ class MokeStatesRepository implements IStatesRepositories {
   }
 
 export { MokeStatesRepository }
+*/

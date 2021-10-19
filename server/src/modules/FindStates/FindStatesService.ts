@@ -4,8 +4,8 @@ import { IStatesRepositories } from '../../repositories/IStatesRepositories'
 class FindStateService {
   constructor (private statesRepositories: IStatesRepositories) {}
 
-  execute (): State[] {
-    return this.statesRepositories.findStates()
+  async execute (): Promise<State[]> {
+    return await this.statesRepositories.findStates()
   }
 }
 

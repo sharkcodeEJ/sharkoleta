@@ -1,8 +1,6 @@
-import { IPointsRepositories } from '@repository/IPointsRepositories'
 import { prisma } from '@database/client'
 import { State } from '@entities/State'
 import { IStatesRepositories } from '@repository/IStatesRepositories'
-import { promisify } from 'util'
 
 class PrismaStatesRepositories implements IStatesRepositories {
 
@@ -14,6 +12,7 @@ class PrismaStatesRepositories implements IStatesRepositories {
             },
             distinct : [ "uf"],
         })
+      console.log(states)
      const regions  = states.map(async (state)=>{
         return {
             name : state.uf,
@@ -32,6 +31,7 @@ class PrismaStatesRepositories implements IStatesRepositories {
             }))
         } 
      })
+     console.log(regions)
 
      return Promise.all(regions);
 

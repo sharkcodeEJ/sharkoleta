@@ -4,8 +4,8 @@ import { FindStateService } from './FindStatesService'
 class FindStateController {
   constructor (private findStateService: FindStateService) {}
 
-  handle (request: Request, response: Response): Response {
-    const states = this.findStateService.execute()
+  async handle (request: Request, response: Response): Promise<Response> {
+    const states = await this.findStateService.execute()
     return response.json(states)
   }
 }

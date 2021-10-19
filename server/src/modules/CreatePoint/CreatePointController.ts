@@ -6,7 +6,6 @@ class CreatePointController {
 
   async handle (request: Request, response: Response): Promise<Response> {
     const { name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, image, cep, itens } = request.body
-
     try {
       await this.createUserService.execute({
         name,
