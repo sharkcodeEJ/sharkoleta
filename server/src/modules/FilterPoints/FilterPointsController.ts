@@ -5,14 +5,9 @@ class FilterPointsController {
   constructor (private filterPointsService: FilterPointsService) {}
 
   async handle (request: Request, response: Response): Promise<Response> {
-    const uf = request.query.uf
-    const city = request.query.city
-    const searchTerm = request.query.searchterm
+    const { uf, city, searchTerm } = request.query
 
-    let points = await this.filterPointsService.execute(uf, city, searchTerm)
-    points = points.map(point => {
-      return { ...point, itens: point.itens.map(item => item.item) }
-    })
+    const points = await this.filterPointsService.execute(String(uf), String(city), String(searchTerm))
     return response.json(points)
   }
 }
