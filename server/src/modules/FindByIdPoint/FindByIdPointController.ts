@@ -5,9 +5,9 @@ class FindByIdPointController {
   constructor (private findByIdPointService: FindByIdPointservice) {}
 
   async handle (request: Request, response: Response): Promise<Response> {
-    const id = request.params.id
+    const { id } = request.params
     const point = await this.findByIdPointService.execute(id)
-    return response.json({ ...point, itens: point.itens.map(item => item.item) })
+    return response.json(point)
   }
 }
 
