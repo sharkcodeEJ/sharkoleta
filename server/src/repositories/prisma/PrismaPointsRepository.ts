@@ -49,11 +49,12 @@ class PrismaPointsRepository implements IPointsRepositories {
           image,
           cep,
           itens: {
-            updateMany: {
+            deleteMany: {
+              pointId: id
+            },
+            createMany: {
               data: itensId,
-              where: {
-                pointId: id
-              }
+              skipDuplicates: true
             }
           }
         },
@@ -92,26 +93,34 @@ class PrismaPointsRepository implements IPointsRepositories {
   }
 
   async filter (uf?: string, city?: string, searchTerm?: string): Promise<Point[]> {
+    let where = {
+      uf,
+      city
+    }
+
+    if (searchTerm) {
+      const customSearch = {
+        OR: [
+          {
+            name: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          },
+          {
+            description: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          }
+        ]
+      }
+      where = Object.assign(where, customSearch)
+    }
+
     try {
       const points = await prisma.point.findMany({
-        where: {
-          uf,
-          city,
-          OR: [
-            {
-              name: {
-                contains: searchTerm,
-                mode: 'insensitive'
-              }
-            },
-            {
-              description: {
-                contains: searchTerm,
-                mode: 'insensitive'
-              }
-            }
-          ]
-        },
+        where: where,
         include: {
           itens: {
             include: {

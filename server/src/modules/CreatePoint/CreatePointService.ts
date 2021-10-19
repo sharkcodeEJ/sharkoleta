@@ -8,9 +8,9 @@ class CreatePointService {
   constructor (private pointsRepository: IPointsRepositories) {}
 
   async execute ({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens }: ICreatePointResquestDTO) {
-    const i: Item[] = []
-    await this.map(i, itens)
-    const pointCreate = Point.create({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens: i })
+    const itensArray: Item[] = []
+    await this.map(itensArray, itens)
+    const pointCreate = Point.create({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens: itensArray })
     await this.pointsRepository.save(pointCreate)
   }
 
