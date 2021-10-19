@@ -1,7 +1,7 @@
 import { State } from '../entities/State'
 
 interface IStatesRepositories {
-  findStates(): State[]
+  findStates():  Promise<State[]>
 }
 
 export { IStatesRepositories }
