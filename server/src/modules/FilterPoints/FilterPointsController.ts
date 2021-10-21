@@ -7,7 +7,7 @@ class FilterPointsController {
   async handle (request: Request, response: Response): Promise<Response> {
     const { uf, city, searchTerm } = request.query
 
-    const points = await this.filterPointsService.execute(String(uf), String(city), String(searchTerm))
+    const points = await this.filterPointsService.execute(uf as string, city as string,searchTerm as string)
     return response.json(points)
   }
 }

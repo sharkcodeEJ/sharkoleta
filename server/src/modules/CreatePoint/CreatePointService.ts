@@ -8,17 +8,15 @@ class CreatePointService {
   constructor (private pointsRepository: IPointsRepositories) {}
 
   async execute ({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens }: ICreatePointResquestDTO) {
-    const i: Item[] = []
-    await this.map(i, itens)
-    const pointCreate = Point.create({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens: i })
-    await this.pointsRepository.save(pointCreate)
-  }
+   
+    const futureitens = itens.map(async (itemDto)=>{
+        const item = await findByIdItemservice.execute(itemDto.id)
+        return item;
+    })
 
-  async map (itens: Item[], itensDto: IItemCreatePointRequestDTO[]) {
-    for (const itemDto of itensDto) {
-      const item = await findByIdItemservice.execute(itemDto.id)
-      itens.push(item)
-    }
+    const baseItens = await Promise.all(futureitens)
+    const pointCreate = Point.create({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens: baseItens })
+    await this.pointsRepository.save(pointCreate)
   }
 }
 

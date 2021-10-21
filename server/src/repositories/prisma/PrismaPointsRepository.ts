@@ -1,6 +1,7 @@
 import { IPointsRepositories } from '@repository/IPointsRepositories'
 import { prisma } from '@database/client'
 import { Point } from '@entities/Point'
+import { webcrypto } from 'crypto'
 
 class PrismaPointsRepository implements IPointsRepositories {
   async save ({ id, name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens }: Point): Promise<void> {
@@ -49,11 +50,12 @@ class PrismaPointsRepository implements IPointsRepositories {
           image,
           cep,
           itens: {
-            updateMany: {
+            deleteMany: {
+              pointId: id
+            },
+            createMany: {
               data: itensId,
-              where: {
-                pointId: id
-              }
+              skipDuplicates: true
             }
           }
         },
@@ -92,26 +94,31 @@ class PrismaPointsRepository implements IPointsRepositories {
   }
 
   async filter (uf?: string, city?: string, searchTerm?: string): Promise<Point[]> {
+    const searchOptions =  [
+      {
+        name: {
+          contains: searchTerm,
+          mode: 'insensitive'
+        }
+      },
+      {
+        description: {
+          contains: searchTerm,
+          mode: 'insensitive'
+        }
+      }
+     ]
+
+  let where = {
+      uf,
+      city
+    }
+  const customSearch = [ undefined, searchOptions ][Number(Boolean(searchTerm))]
+  where = Object.assign(where, customSearch)
+  
     try {
       const points = await prisma.point.findMany({
-        where: {
-          uf,
-          city,
-          OR: [
-            {
-              name: {
-                contains: searchTerm,
-                mode: 'insensitive'
-              }
-            },
-            {
-              description: {
-                contains: searchTerm,
-                mode: 'insensitive'
-              }
-            }
-          ]
-        },
+        where,
         include: {
           itens: {
             include: {
