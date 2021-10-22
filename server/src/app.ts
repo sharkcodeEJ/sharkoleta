@@ -16,11 +16,11 @@ const messageError = (err: Error, request: Request, respose: Response, next: Nex
   })
 }
 
-app.use(cors)
-
 app.use(express.json())
 
 app.use(routes)
+
+app.use(cors())
 
 app.use(messageError)
 
