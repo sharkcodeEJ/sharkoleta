@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { routes } from './routes'
+import cors from 'cors'
 
 const app = express()
 
@@ -14,6 +15,8 @@ const messageError = (err: Error, request: Request, respose: Response, next: Nex
     message: `Internal server error - ${err}`
   })
 }
+
+app.use(cors)
 
 app.use(express.json())
 
