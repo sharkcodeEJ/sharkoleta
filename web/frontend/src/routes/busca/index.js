@@ -1,4 +1,5 @@
 import React,{useEffect, useState} from 'react';
+import api from '../../services/api';
 import { 
     Container, 
     Input,
@@ -23,10 +24,11 @@ import {
     MenuButton,
     MenuList,
     MenuItem,
-    Menu
+    Menu,
+    Link
  } from "@chakra-ui/react"
 
-import {ArrowBackIcon,SearchIcon,ChevronDownIcon,HamburgerIcon} from "@chakra-ui/icons"
+import {ArrowBackIcon,SearchIcon,ChevronDownIcon,HamburgerIcon, PhoneIcon, Search2Icon, InfoIcon} from "@chakra-ui/icons"
 
 import ImagemLampadas from '../cadastro/imgs/lampadas.svg';
 import ImagemPilhas from '../cadastro/imgs/baterias.svg';
@@ -53,37 +55,26 @@ const dadosFake = [
             localidade:[-28.4746953,-49.0162887]
         },
         codModalidades:[1,2,3]
-    },
-    {
-        nome:'Giassi',
-        horarios: 'Aberto das 08:00 as 12:00 ate 13:00 as 18:00',
-        localizacao:{
-            endereco: 'Pasto do Gado',
-            numero: 393,
-            bairro: 'Andrino',
-            cidade: 'Tubarao',
-            localidade:[-28.4943835,-48.9961946]
-        },
-        codModalidades:[1,2,3]
-    },
-    {
-        nome:'Americanas',
-        horarios: 'Aberto das 08:00 as 12:00 ate 13:00 as 18:00',
-        localizacao:{
-            endereco: 'Giassi',
-            numero: 393,
-            bairro: 'centro',
-            cidade: 'tubarao',
-            localidade:[-28.4746953,-49.0162887]
-        },
-        codModalidades:[1,2,3]
     }
 ]
 
 function ComponentCardsPesquisa({data, onSelected}){
     const [showMessage,setShowMessage] = useState(false);
+
+    const [points, setPoints] = useState([]);
+
+    useEffect(() => {
+        console.log("teaste");
+        api.get('points', {}).then (response => {
+            setPoints(response.data);
+            console.log("REsponse: " + response.data);
+        })
+    }, [])
+
     return (
-        <Stack
+        <>
+        {points.map(point =>(
+            <Stack
             width='calc(50% - 100px)'
             background='red'
             direction='column'
@@ -117,26 +108,54 @@ function ComponentCardsPesquisa({data, onSelected}){
                 left='0px'
 
             >
-                <Button
-                    padding='20px 30px'
-                    borderRadius='10px'
-                    cursor='pointer'
-                    color='#fff'
-                    letterSpacing='1px'
-                    transition='all 2s'
-                    _hover={{
-                        boxShadow:'inset 500px 0px 20px 0px #009900'
-                    }}
-                    background='#00cc00'
-                    fontFamily={`'Roboto', sans-serif`}
-                    fontWeight='bold'
-                    fontSize='15px'
-                    display={showMessage ? `block` : `none`}
-                    onClick={()=> onSelected(data)}
+                <Stack direction="column">
+                    <a href="#mapa" style={{textDecoration: 'none'}}>
+                        <Button
+                            leftIcon={<Search2Icon/>}
+                            padding='20px 30px'
+                            borderRadius='10px'
+                            cursor='pointer'
+                            color='#fff'
+                            letterSpacing='1px'
+                            transition='all 2s'
+                            _hover={{
+                                boxShadow:'inset 500px 0px 20px 0px #009900'
+                            }}
+                            background='#00cc00'
+                            fontFamily={`'Roboto', sans-serif`}
+                            fontWeight='bold'
+                            fontSize='15px'
+                            display={showMessage ? `block` : `none`}
+                            onClick={()=> onSelected(point)}
 
-                >
-                    Visualizar no mapa
-                </Button>
+                        >
+                            Visualizar no mapa
+                        </Button>
+                    </a>
+                    <a href={`point/?id=${point.id}`} style={{textDecoration: 'none'}}>
+                        <Button
+                            leftIcon={<InfoIcon />}                
+                            padding='20px 30px'
+                            borderRadius='10px'
+                            cursor='pointer'
+                            color='#fff'
+                            letterSpacing='1px'
+                            transition='all 2s'
+                            _hover={{
+                                boxShadow:'inset 500px 0px 20px 0px #009900'
+                            }}
+                            background='#00cc00'
+                            fontFamily={`'Roboto', sans-serif`}
+                            fontWeight='bold'
+                            fontSize='15px'
+                            display={showMessage ? `block` : `none`}
+                            onClick={()=> onSelected(point)}
+
+                        >
+                            Ver ponto de coleta
+                        </Button>
+                    </a>                    
+                </Stack>
             </Center>
             <Text 
                 fontWeight='bolder'
@@ -145,7 +164,7 @@ function ComponentCardsPesquisa({data, onSelected}){
                 align='center'
                 fontSize='15px'
             >
-                {data.nome}
+                {point.name}
             </Text>
             <List spacing='20px'>
                 <ListItem
@@ -160,7 +179,7 @@ function ComponentCardsPesquisa({data, onSelected}){
                         margin='0px 10px 0px 0px'
                         src={ListaTempo}
                     />
-                    {data.horarios}
+                    {point.whatsapp}
                 </ListItem>
                 <ListItem
                     display='flex'
@@ -174,10 +193,10 @@ function ComponentCardsPesquisa({data, onSelected}){
                         src={ListaLocalizacao}
                         margin='0px 10px 0px 0px'
                     />
-                    {`${data.localizacao.endereco}, `} 
-                    {`${data.localizacao.bairro}, `}
-                    {`${data.localizacao.numero}, `}
-                    {`${data.localizacao.cidade}`}
+                    {`${point.address}, `} 
+                    {`${point.district}, `}
+                    {`${point.number}, `}
+                    {`${point.city}`}
 
                 </ListItem>
             </List>
@@ -189,6 +208,8 @@ function ComponentCardsPesquisa({data, onSelected}){
                 </Stack>
             </Center>
         </Stack>
+        ))}
+        </>
     )
 }
 
@@ -605,7 +626,7 @@ export function ComponentBusca(props){
                                         <ComponentCardsPesquisa
                                             data={el}
                                             onSelected={(d)=>{
-                                                setPointSelected(d.localizacao.localidade)
+                                                setPointSelected([d.latitude,d.longitude])
                                             }}
                                         />
                                     )
@@ -624,7 +645,7 @@ export function ComponentBusca(props){
                                 >
                                     Localização
                                 </Text>
-                                <Box  height='400px' background='#f2f2f2'>
+                                <Box  height='400px' background='#f2f2f2' id="mapa">
                                     {!pointSelected ? 
                                     (
                                         <Center 
