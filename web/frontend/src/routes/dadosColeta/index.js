@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import axious from 'axios';
+import api from '../../services/api';
 import { 
     Container, 
     Input,
@@ -31,10 +31,11 @@ import {
     MenuList,
     MenuItem,
     Menu,
-    MenuButton
+    MenuButton,
+    Link
  } from "@chakra-ui/react"
 
-import {ArrowBackIcon,SearchIcon,PhoneIcon,TimeIcon,HamburgerIcon} from "@chakra-ui/icons"
+import {ArrowBackIcon,SearchIcon,PhoneIcon,TimeIcon,HamburgerIcon, InfoIcon, EmailIcon} from "@chakra-ui/icons"
 
 import Tel from './imgs/tel.svg';
 import Local from './imgs/Group.svg';
@@ -130,9 +131,24 @@ export function ComponentPerfil(props){
         getLocationPoint();
     },[])
 
+    const [points, setPoints] = useState([]);
+
+    console.log("Points????????: " + points.name);
+
+    let urlId = window.location.search.substring(4).split('&');
+    console.log("url: "+ urlId);
+
+    useEffect(() => {
+        console.log("teaste");
+        api.get(`points/${urlId}`, {}).then (response => {
+            setPoints(response.data);
+        })
+    }, [])
+
+
 
     return (
-    <>
+    <>  
         <Container 
             display='flex'
             alignItems='center'
@@ -257,7 +273,7 @@ export function ComponentPerfil(props){
                         margin='0px 0px 40px 0px'
 
                 >
-                        IFSC - Instituto Federal de Santa Catarina (Campus Tubarao)
+                    {points.name}
                 </Heading>
                 <Stack
                     width='900px'
@@ -281,10 +297,7 @@ export function ComponentPerfil(props){
                         fontFamily={`'Ubuntu', sans-serif`}
                         color='#4F4F4F'  
                     >
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                        nisi ut aliquip ex ea commodo consequat.    
+                        {points.description}   
                     </Text>
                     <Box
                         display='flex'
@@ -303,7 +316,7 @@ export function ComponentPerfil(props){
                                 justifyContent='flex-start'
                             >
                                 <ListIcon as={PhoneIcon} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
-                                    {`${'(48) 3301-9100'} ${'(48) 3301-9100'}`}
+                                    {`${points.whatsapp} ${!points.fone ? points.fone : "" }`}
                             </ListItem>
                             <ListItem
                                 color='#4F4F4F' 
@@ -315,13 +328,13 @@ export function ComponentPerfil(props){
                                 justifyContent='flex-start'
                                 
                             >
-                            <ListIcon as={LocalGoogle} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
+                            <ListIcon as={EmailIcon} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
                             <Text
                                 display='inline-block' 
                                 maxWidth='300px'
                                 minWidth='200px'
                             >
-                                {`${'Rua Deputado Olices Pedra de Caldas'}, ${'480'}, ${'Dehon'} - ${'Tubarão / SC'}`}
+                                {`${points.email}`}
                             </Text>
                             </ListItem>
                             <ListItem
@@ -333,13 +346,13 @@ export function ComponentPerfil(props){
                                 alignItems='flex-start'
                                 justifyContent='flex-start'
                             >
-                                <ListIcon as={TimeIcon} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
+                                <ListIcon as={InfoIcon} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
                                 <Text
                                     display='inline-block'
                                     maxWidth='300px'
                                     minWidth='200px'
                                 >
-                                    {`${'Rua Deputado Olices Pedra de Caldas'}, ${'480'}, ${'Dehon'} - ${'Tubarão / SC'}`}
+                                    {`${points.address}, ${points.number}, ${points.district} - ${points.city} / ${points.uf}`}
                                 </Text>
 
                                </ListItem>
@@ -365,71 +378,73 @@ export function ComponentPerfil(props){
                                     spacing='15px'
                                     color='#2AC28B'
                                     fontSize='15px'
-                                >
-                                    <ListItem>Televisores</ListItem>
-                                    <ListItem>Celulares</ListItem>
-                                    <ListItem>Lampadas</ListItem>
-                                    <ListItem>Camputadores</ListItem>
-                                    <ListItem>Carregadores de celulares</ListItem>
+                                >   
+                                    <ListItem>{points.Image}</ListItem>
                                 </UnorderedList>
                             </Box>
                         </Box>     
                     </Box>
                     <Divider />
                     <Box>
-                        <Button
-                            background='#34CB79'
-                            leftIcon={<Image color='inherit' marginRight='10px' src={Wpp}/>}
-                            color='#FFF'
-                            padding='20px'
-                            borderRadius='10px'
-                            marginRight='20px'
-                            width='200px'
-                            float='left'
-                            fontWeight='bolder'
-                            transition='background .5s'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#1a653c'
-                            }}
+                        <a href={`https://api.whatsapp.com/send?l=pt&phone=${points.whatsapp}`} target="_blank">
+                            <Button
+                                background='#34CB79'
+                                leftIcon={<Image color='inherit' marginRight='10px' src={Wpp}/>}
+                                color='#FFF'
+                                padding='20px'
+                                borderRadius='10px'
+                                marginRight='20px'
+                                width='200px'
+                                float='left'
+                                fontWeight='bolder'
+                                transition='background .5s'
+                                cursor='pointer'
+                                _hover={{
+                                    background:'#1a653c'
+                                }}
 
-                        >
-                            WhatsApp
-                        </Button>
-                        <Button
-                            background='#34CB79'
-                            leftIcon={<Image color='inherit' marginRight='10px' src={Email}/>}
-                            color='#FFF'
-                            padding='20px'
-                            width='200px'
-                            borderRadius='10px'
-                            float='left'
-                            fontWeight='bolder'
-                            transition='background .5s'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#1a653c'
-                            }}
-                        >
-                            E-mail
-                        </Button>
-                        <Button
-                            background='#2F80ED'
-                            leftIcon={<Image color='inherit' marginRight='10px' src={Local}/>}
-                            color='#FFF'
-                            padding='20px 40px'
-                            borderRadius='10px'
-                            float='right'
-                            fontWeight='bolder'
-                            onClick={goRotaGoogle}
-                            transition='background .5s'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#0e4fa4'
-                            }}
-                        >
-                            Localizar
-                        </Button>
+                            >
+                                WhatsApp
+                            </Button>
+                        </a>
+                        <a href={`mailto:${points.email}`} >
+                            <Button
+                                background='#34CB79'
+                                leftIcon={<Image color='inherit' marginRight='10px' src={Email}/>}
+                                color='#FFF'
+                                padding='20px'
+                                width='200px'
+                                borderRadius='10px'
+                                float='left'
+                                fontWeight='bolder'
+                                transition='background .5s'
+                                cursor='pointer'
+                                _hover={{
+                                    background:'#1a653c'
+                                }}
+                            >
+                                E-mail
+                            </Button>
+                        </a>
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${points.latitude}%2C${points.longitude}`} target="_blank">
+                            <Button
+                                background='#2F80ED'
+                                leftIcon={<Image color='inherit' marginRight='10px' src={Local}/>}
+                                color='#FFF'
+                                padding='20px 40px'
+                                borderRadius='10px'
+                                float='right'
+                                fontWeight='bolder'
+                                onClick={goRotaGoogle}
+                                transition='background .5s'
+                                cursor='pointer'
+                                _hover={{
+                                    background:'#0e4fa4'
+                                }}
+                            >
+                                Localizar
+                            </Button>
+                        </a>
                     </Box>
                 </Stack>
             </Center>

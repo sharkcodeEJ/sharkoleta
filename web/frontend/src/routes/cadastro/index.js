@@ -1,8 +1,9 @@
-import React,{useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import Axios from 'axios';
+import api from '../../services/api';
 
-import { 
-    Container, 
+import {
+    Container,
     Input,
     FormControl,
     FormLabel,
@@ -13,7 +14,8 @@ import {
     Button,
     Wrap,
     WrapItem,
-    Text,    
+    Text,
+    Textarea,
     IconButton,
     InputGroup,
     InputRightElement,
@@ -23,11 +25,11 @@ import {
     Menu,
     MenuItem,
     MenuButton
- } from "@chakra-ui/react";
+} from "@chakra-ui/react";
 
- import {Map,Marker,TileLayer,Popup} from 'react-leaflet';
+import { Map, Marker, TileLayer, Popup } from 'react-leaflet';
 
-import {DownloadIcon,ArrowBackIcon,SearchIcon,HamburgerIcon} from "@chakra-ui/icons"
+import { DownloadIcon, SearchIcon, HamburgerIcon } from "@chakra-ui/icons"
 import ImagemLampadas from './imgs/lampadas.svg';
 import ImagemPilhas from './imgs/baterias.svg';
 import ImagemEletronicos from './imgs/eletronicos.svg';
@@ -36,106 +38,119 @@ import Us from './imgs/us.svg'
 import Home from './imgs/home.svg'
 import Search from './imgs/search.svg'
 
-export function ComponentCadastro(props){
+export function ComponentCadastro(props) {
+
+    const marginImage = '0px 40px 0px 0px';
+
     const classes = {
-        selectedItem:{
-            border:'3px solid #2AC28B',
-            transform:'scale(1.02)'
+        selectedItem: {
+            border: '3px solid #2AC28B',
+            transform: 'scale(1.02)'
         }
     }
 
     const [loaders, setLoaders] = useState({
-        searchCEP:false,
-        searchPosition:false
+        searchCEP: false,
+        searchPosition: false
     });
-    const [position, setPosition] = useState([-28.4781703,-49.1820172]);
+    const [position, setPosition] = useState([-28.4781703, -49.1820172]);
+    // eslint-disable-next-line no-unused-vars
     const [zoom, setZoom] = useState(13);
     const [endereco, setEndereco] = useState({
-        rua:null,
-        bairro:null,
-        numero:null,
-        cidade:null,
-        uf:null,
-        cep:null
+        rua: null,
+        bairro: null,
+        numero: null,
+        cidade: null,
+        uf: null,
+        cep: null
     });
     const [dados, setDados] = useState({
-        nome:null,
-        email:null,
-        numero:null
+        name: null,
+        email: null,
+        description: null,
+        whatsapp: null,
+        fone: null,
+        latitude: 10,
+        longitude: 10,
+        city: endereco.cidade,
+        uf: endereco.uf,
+        address: endereco.rua,
+        district: endereco.bairro,
+        number: endereco.numero,
+        image: " ",
+        cep: endereco.cep,
+        itens: {
+            id: 1
+        }
     });
 
     const [itensSelected, setItensSelected] = useState({
-        lampadas:false,
-        pilhas:false,
-        residuos:false
+        lampadas: false,
+        pilhas: false,
+        residuos: false
     });
 
 
-    function getLocationPoint(){
-        try{
+    function getLocationPoint() {
+        try {
             setLoaders({
                 ...loaders,
-                searchPosition:true
+                searchPosition: true
             });
 
-            window.navigator.geolocation.getCurrentPosition(resolve =>{
-                const {latitude,longitude} = resolve.coords; 
-                setPosition([latitude,longitude]);
+            window.navigator.geolocation.getCurrentPosition(resolve => {
+                const { latitude, longitude } = resolve.coords;
+                setPosition([latitude, longitude]);
+
                 Axios
-                    .get(`https://nominatim.openstreetmap.org/reverse?lat=${
-                        latitude
-                    }&lon=${
-                        longitude
-                    }&addressdetails=1&format=json`)
-                .then(resolve => {
-                    const {data} = resolve;
-                    setEndereco({
-                        ...endereco,
-                        cidade: data.address.city,
-                        rua: data.address.road,
-                        uf: data.address.state,
-                        bairro: data.address.suburb,
-                        cep: data.address.postcode,
-                    });
+                    .get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude
+                        }&lon=${longitude
+                        }&addressdetails=1&format=json`)
+                    .then(resolve => {
+                        const { data } = resolve;
+                        setEndereco({
+                            ...endereco,
+                            cidade: data.address.city,
+                            rua: data.address.road,
+                            uf: data.address.state,
+                            bairro: data.address.suburb,
+                            cep: data.address.postcode,
+                        });
 
-                    setLoaders({
-                        ...loaders,
-                        searchPosition:false
+                        setLoaders({
+                            ...loaders,
+                            searchPosition: false
+                        });
                     });
-                });
             });
-        }catch(error){
+        } catch (error) {
             setLoaders({
                 ...loaders,
-                searchPosition:false
+                searchPosition: false
             });
 
             console.log(error);
         }
     }
 
-    async function getCEP(){
-        try{
+    async function getCEP() {
+        try {
             setLoaders({
                 ...loaders,
-                searchCEP:true
+                searchCEP: true
             });
 
-            const { data:response } = await Axios
+            const { data: response } = await Axios
                 .get(`https://viacep.com.br/ws/${endereco.cep}/json/`)
 
-            const { data: responsePositionCode} = await Axios
-                .get(`https://nominatim.openstreetmap.org/search?street=${
-                    `${response.logradouro}` 
-                    }&city=${
-                        response.localidade
-                    }&state=${
-                        response.uf
-                    }&postalcode=${
-                        endereco.cep
+            const { data: responsePositionCode } = await Axios
+                .get(`https://nominatim.openstreetmap.org/search?street=${`${response.logradouro}`
+                    }&city=${response.localidade
+                    }&state=${response.uf
+                    }&postalcode=${endereco.cep
                     }&format=json&limit=1`
                 )
-    
+
             setEndereco({
                 ...endereco,
                 rua: response.logradouro,
@@ -145,40 +160,58 @@ export function ComponentCadastro(props){
                 uf: response.uf
             });
 
-           setPosition([
+            setPosition([
                 responsePositionCode[0].lat,
                 responsePositionCode[0].lon,
             ]);
 
             setLoaders({
                 ...loaders,
-                searchCEP:false
+                searchCEP: false
             });
 
-        }catch(error){
+        } catch (error) {
             setLoaders({
                 ...loaders,
-                searchPosition:false
+                searchPosition: false
             });
             console.log(error.message)
         }
     }
 
-    function formatNumber(strNumber){
-        if(!typeof strNumber === 'string') return;
+    function formatNumber(strNumber) {
+        if (!typeof strNumber === 'string') return;
 
         const length = strNumber.length;
 
-        if(length === 2)
+        if (length === 2)
             return `(${strNumber.charAt(0)}${strNumber.charAt(1)}) `
 
-        if(length === 9){
+        if (length === 9) {
             return `${strNumber.substring(-9)} - ${strNumber.substring(9)}`
         }
     }
 
+    async function sendData(event) {
+        event.preventDefault();
+
+        alert("Dados: " + dados.name);
+
+
+        try {
+            await api.post('points', { dados }).then((result) => {
+                console.log(result.data);
+            })
+                .catch((error) => {
+                    console.log(error);
+                });
+        } catch (err) {
+            console.log("erro: " + err);
+        }
+    }
+
     return (
-        <Container 
+        <Container
             display='flex'
             alignItems='center'
             justifyContent='flex-start'
@@ -197,11 +230,11 @@ export function ComponentCadastro(props){
                 padding='5px'
                 zIndex={1000}
             >
-               <Menu>
+                <Menu>
                     <MenuButton
                         as={IconButton}
                         aria-label="Options"
-                        icon={<HamburgerIcon width='25px' height='auto'/>}
+                        icon={<HamburgerIcon width='25px' height='auto' />}
                         variant="outline"
                         padding='20px'
                         margin='0px 0px 0px 50px'
@@ -211,63 +244,63 @@ export function ComponentCadastro(props){
                         border='2px solid #49d085'
                         transition='all .2s'
                         _hover={{
-                            background:'rgb(0,0,0,0.3)'
+                            background: 'rgb(0,0,0,0.3)'
                         }}
                     />
-                    <MenuList 
-                        maxWidth='500px' 
-                        minWidth='300px' 
+                    <MenuList
+                        maxWidth='500px'
+                        minWidth='300px'
                         width='400px'
                         background='#1a653c'
                         color='#d6f5e4'
                         //fontWeight='400'
                         fontSize='18px'
-                        
+
                     >
-                        <MenuItem 
-                            padding='20px' 
-                            fontWeight='550' 
+                        <MenuItem
+                            padding='20px'
+                            fontWeight='550'
                             fontSize='inherit'
                             letterSpacing='2px'
                             background='inherit'
                             transition='all .2s'
                             cursor='pointer'
                             _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
+                                background: '#e6e6e6',
+                                color: '#1a653c'
                             }}
                         >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Home}/>
+                            <Image margin={marginImage} color='#FFF' src={Home} />
                             Inicio
                         </MenuItem>
-                        <MenuItem 
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
+                        <MenuItem
+                            padding='20px'
+                            background='inherit'
+                            fontWeight='550'
                             letterSpacing='2px'
                             fontSize='inherit'
                             cursor='pointer'
                             _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
+                                background: '#e6e6e6',
+                                color: '#1a653c'
                             }}
                         >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Us}/>
+                            <Image margin={marginImage} color='#FFF' src={Us} />
                             Junte-se a nos
                         </MenuItem>
-                        <MenuItem  
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
+                        <MenuItem
+                            padding='20px'
+                            background='inherit'
+                            fontWeight='550'
                             letterSpacing='2px'
                             fontSize='inherit'
                             cursor='pointer'
                             _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
+                                background: '#e6e6e6',
+                                color: '#1a653c'
                             }}
                         >
-                            <Image margin ='0px 40px 0px 0px' color='#FFF' src={Search}/>
+                            <Image margin='0px 40px 0px 0px' color='#FFF' src={Search} />
                             Localizar
                         </MenuItem>
                     </MenuList>
@@ -291,7 +324,7 @@ export function ComponentCadastro(props){
                 <Stack
                     direction='column'
                     spacing='50px'
-                    
+
                 >
                     <Heading
                         display='block'
@@ -303,11 +336,11 @@ export function ComponentCadastro(props){
                         padding='20px'
 
                     >
-                    
+
                         Dados
                     </Heading>
-                
-                    <form>
+
+                    <form onSubmit={sendData}>
                         <Stack
                             direction='column'
                             spacing='120px'
@@ -315,58 +348,58 @@ export function ComponentCadastro(props){
                             minWidth='600px'
                             width='700px'
                         >
-                        <Box>
-                            <Text
-                                fontSize='25px'
-                                fontWeight='bolder'
-                                color='#322153'
-                                fontFamily={` 'Ubuntu', sans-serif`}
-                                margin='0px 0px 30px 0px'
-                            >
-                                Informações pessoais
-                            </Text>
-                            <FormControl
-                                display='block'
-                                id='nome'
-                                className='inputs-form-hover'
-                            >
-                                    <FormLabel 
+                            <Box>
+                                <Text
+                                    fontSize='25px'
+                                    fontWeight='bolder'
+                                    color='#322153'
+                                    fontFamily={` 'Ubuntu', sans-serif`}
+                                    margin='0px 0px 30px 0px'
+                                >
+                                    Informações pessoais
+                                </Text>
+                                <FormControl
+                                    display='block'
+                                    id='name'
+                                    className='inputs-form-hover'
+                                >
+                                    <FormLabel
                                         marginBottom='10px'
                                         color='#322153'
                                         fontFamily={`'Poppins', sans-serif`}
                                     >
                                         Nome da entidade
                                     </FormLabel>
-                                    <Input 
-                                        variant="outline" 
+                                    <Input
+                                        variant="outline"
                                         type='text'
                                         background='#F0F0F5'
                                         width='100%'
                                         height='50px'
-                                        value={dados.nome}
+                                        value={dados.name}
                                         borderRadius='15px'
-                                        onInput={(e)=> setDados({...dados, nome: e.target.value})}
+                                        onInput={(e) => setDados({ ...dados, name: e.target.value })}
                                         padding='20px'
                                         boxSizing='border-box'
                                         className='dados-form'
-                                        id='nome-entidade'
+                                        id='name'
                                     />
-                            </FormControl>
-                            <FormControl
-                                display='block'
-                                margin='50px 0px 0px 0px'
-                                id='email'
-                                className='inputs-form-hover'
-                            >
-                                    <FormLabel 
+                                </FormControl>
+                                <FormControl
+                                    display='block'
+                                    margin='50px 0px 0px 0px'
+                                    id='email'
+                                    className='inputs-form-hover'
+                                >
+                                    <FormLabel
                                         marginBottom='10px'
                                         color='#322153'
                                         fontFamily={`'Poppins', sans-serif`}
                                     >
                                         E-mail
                                     </FormLabel>
-                                    <Input 
-                                        variant="outline" 
+                                    <Input
+                                        variant="outline"
                                         type='text'
                                         background='#F0F0F5'
                                         width='100%'
@@ -374,89 +407,149 @@ export function ComponentCadastro(props){
                                         borderRadius='15px'
                                         padding='20px'
                                         boxSizing='border-box'
-                                        onInput={(e)=> setDados({...dados,email:e.target.value})}
+                                        onInput={(e) => setDados({ ...dados, email: e.target.value })}
                                         value={dados.email}
                                     />
-                            </FormControl>
-                            <FormControl
-                                display='block'
-                                maxWidth='30%'
-                                margin='50px 0px 0px 0px'
-                                id='telefone'
-                                className='inputs-form-hover'
-                            >
-                                    <FormLabel 
+                                </FormControl>
+                                <FormControl
+                                    display='block'
+                                    margin='50px 0px 0px 0px'
+                                    id='description'
+                                    className='inputs-form-hover'
+                                >
+                                    <FormLabel
                                         marginBottom='10px'
                                         color='#322153'
                                         fontFamily={`'Poppins', sans-serif`}
                                     >
-                                        WhatsApp
+                                        Descrição
                                     </FormLabel>
-                                    <Input 
-                                        variant="outline" 
+                                    <Textarea
+                                        resize='vertical'
+                                        variant="outline"
                                         type='text'
                                         background='#F0F0F5'
                                         width='100%'
-                                        height='50px'
+                                        height='150px'
                                         borderRadius='15px'
                                         padding='20px'
                                         boxSizing='border-box'
-                                        onInput={(e)=> {
-                                            const typeEvent = e.nativeEvent.inputType;
-
-                                            const value = 
-                                                e.target.value.length >= 2 && typeEvent !== "deleteContentBackward"  
-                                                ? formatNumber(e.target.value) : e.target.value
-
-                                            setDados({...dados, numero: value})
-                                        }}
-                                        value={dados.numero}
+                                        onInput={(e) => setDados({ ...dados, description: e.target.value })}
+                                        value={dados.description}
                                     />
-                            </FormControl>
-                        </Box>
-                        <Box>
-                            <Text
-                                fontSize='25px'
-                                fontWeight='bolder'
-                                color='#322153'
-                                fontFamily={` 'Ubuntu', sans-serif`}
-                                margin='0px 0px 30px 0px'
-                            >
-                                Endereço
-                            </Text>
-                            <Box height='500px' position='relative'>
-                                <Map center={position} zoom={zoom} style={{width:`100%`,height:'100%',zIndex:10}}>
-                                    <TileLayer
-                                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
-                                    <Marker position={position}>
-                                    <Popup>
-                                        Vocë esta aqui!
-                                    </Popup>
-                                    </Marker>
-                                </Map>
-                            </Box>
-                            <Stack
-                                spacing='20px'
-                                direction='row'
-                                margin='30px 0px 0px 0px'
-                            >
+                                </FormControl>
+
                                 <FormControl
-                                    display='block'
-                                    id='cidade'
-                                    maxWidth='40%'
+                                    display='flex'
+                                    justifyContent='space-between'
+                                    maxWidth='100%'
+                                    margin='50px 0px 0px 0px'
+                                    id='telefone'
                                     className='inputs-form-hover'
                                 >
-                                        <FormLabel 
+                                    <div>
+                                        <FormLabel
+                                            marginBottom='10px'
+                                            color='#322153'
+                                            fontFamily={`'Poppins', sans-serif`}
+                                        >
+                                            WhatsApp
+                                        </FormLabel>
+                                        <Input
+                                            variant="outline"
+                                            type='text'
+                                            background='#F0F0F5'
+                                            width='100%'
+                                            height='50px'
+                                            borderRadius='15px'
+                                            padding='20px'
+                                            boxSizing='border-box'
+                                            onInput={(e) => {
+                                                const typeEvent = e.nativeEvent.inputType;
+
+                                                const value =
+                                                    e.target.value.length >= 2 && typeEvent !== "deleteContentBackward"
+                                                        ? formatNumber(e.target.value) : e.target.value
+
+                                                setDados({ ...dados, whatsapp: value })
+                                            }}
+                                            value={dados.whatsapp}
+                                        />
+                                    </div>
+                                    <div>
+                                        <FormLabel
+                                            marginBottom='10px'
+                                            color='#322153'
+                                            fontFamily={`'Poppins', sans-serif`}
+                                        >
+                                            Telefone secundário
+                                        </FormLabel>
+                                        <Input
+                                            variant="outline"
+                                            type='text'
+                                            background='#F0F0F5'
+                                            width='100%'
+                                            height='50px'
+                                            borderRadius='15px'
+                                            padding='20px'
+                                            boxSizing='border-box'
+                                            onInput={(e) => {
+                                                const typeEvent = e.nativeEvent.inputType;
+
+                                                const value =
+                                                    e.target.value.length >= 2 && typeEvent !== "deleteContentBackward"
+                                                        ? formatNumber(e.target.value) : e.target.value
+
+                                                setDados({ ...dados, fone: value })
+                                            }}
+                                            value={dados.fone}
+                                        />
+                                    </div>
+                                </FormControl>
+                            </Box>
+                            <Box>
+                                <Text
+                                    fontSize='25px'
+                                    fontWeight='bolder'
+                                    color='#322153'
+                                    fontFamily={` 'Ubuntu', sans-serif`}
+                                    margin='0px 0px 30px 0px'
+                                >
+                                    Endereço
+                                </Text>
+                                <Box height='500px' position='relative'>
+                                    <Map center={position} zoom={zoom} style={{ width: `100%`, height: '100%', zIndex: 10 }}>
+                                        <TileLayer
+                                            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        <Marker position={position}>
+                                            <Popup>
+                                                Vocë esta aqui!
+                                            </Popup>
+                                        </Marker>
+                                    </Map>
+                                </Box>
+                                <Stack
+                                    spacing='20px'
+                                    direction='row'
+                                    margin='30px 0px 0px 0px'
+                                >
+                                    <FormControl
+                                        display='block'
+                                        id='cidade'
+                                        maxWidth='40%'
+                                        className='inputs-form-hover'
+                                    >
+                                        <FormLabel
                                             marginBottom='10px'
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
                                         >
                                             Cidade
                                         </FormLabel>
-                                        <Input 
-                                            variant="outline" 
+                                        <Input
+                                            variant="outline"
                                             type='text'
                                             background='#F0F0F5'
                                             width='100%'
@@ -465,23 +558,23 @@ export function ComponentCadastro(props){
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.cidade}
-                                            
+
                                         />
-                                </FormControl>
-                                <FormControl
-                                    display='block'
-                                    id='bairro'
-                                    className='inputs-form-hover'
-                                >
-                                        <FormLabel 
+                                    </FormControl>
+                                    <FormControl
+                                        display='block'
+                                        id='bairro'
+                                        className='inputs-form-hover'
+                                    >
+                                        <FormLabel
                                             marginBottom='10px'
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
                                         >
                                             Bairro
                                         </FormLabel>
-                                        <Input 
-                                            variant="outline" 
+                                        <Input
+                                            variant="outline"
                                             type='text'
                                             background='#F0F0F5'
                                             width='100%'
@@ -490,24 +583,24 @@ export function ComponentCadastro(props){
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.bairro}
-                                            
+
                                         />
-                                </FormControl>
-                                <FormControl
-                                    display='block'
-                                    maxWidth='15%'
-                                    id='numero'
-                                    className='inputs-form-hover'
-                                >
-                                        <FormLabel 
+                                    </FormControl>
+                                    <FormControl
+                                        display='block'
+                                        maxWidth='15%'
+                                        id='numero'
+                                        className='inputs-form-hover'
+                                    >
+                                        <FormLabel
                                             marginBottom='10px'
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
                                         >
                                             Numero
                                         </FormLabel>
-                                        <Input 
-                                            variant="outline" 
+                                        <Input
+                                            variant="outline"
                                             type='text'
                                             background='#F0F0F5'
                                             width='100%'
@@ -516,29 +609,29 @@ export function ComponentCadastro(props){
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.numero}
-                                            
+
                                         />
-                                </FormControl>
-                            </Stack>
-                            <Stack
-                                spacing='20px'
-                                direction='row'
-                                margin='30px 0px 0px 0px'
-                            >
-                                <FormControl
-                                    display='block'
-                                    id='bairro'
-                                    className='inputs-form-hover'
+                                    </FormControl>
+                                </Stack>
+                                <Stack
+                                    spacing='20px'
+                                    direction='row'
+                                    margin='30px 0px 0px 0px'
                                 >
-                                        <FormLabel 
+                                    <FormControl
+                                        display='block'
+                                        id='bairro'
+                                        className='inputs-form-hover'
+                                    >
+                                        <FormLabel
                                             marginBottom='10px'
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
                                         >
                                             Endereço
                                         </FormLabel>
-                                        <Input 
-                                            variant="outline" 
+                                        <Input
+                                            variant="outline"
                                             type='text'
                                             background='#F0F0F5'
                                             width='100%'
@@ -547,16 +640,16 @@ export function ComponentCadastro(props){
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.rua}
-                                            
+
                                         />
-                                </FormControl>
-                                <FormControl
-                                    display='block'
-                                    maxWidth='25%'
-                                    id='cep'
-                                    className='inputs-form-hover'
-                                >
-                                        <FormLabel 
+                                    </FormControl>
+                                    <FormControl
+                                        display='block'
+                                        maxWidth='25%'
+                                        id='cep'
+                                        className='inputs-form-hover'
+                                    >
+                                        <FormLabel
                                             marginBottom='10px'
                                             color='#322153'
                                             fontFamily={`'Poppins', sans-serif`}
@@ -580,17 +673,17 @@ export function ComponentCadastro(props){
                                                         borderRadius='5px'
                                                         cursor='pointer'
                                                         boxSizing='border-box'
-                                                        onClick={()=> getCEP()}
+                                                        onClick={() => getCEP()}
                                                     >
-                                                        {!loaders.searchCEP 
-                                                            ? (<SearchIcon  height='20px' width='20px'/>)
-                                                            : (<Spinner height='20px' width='20px' color='inherit'/>)}
-                                                        
+                                                        {!loaders.searchCEP
+                                                            ? (<SearchIcon height='20px' width='20px' />)
+                                                            : (<Spinner height='20px' width='20px' color='inherit' />)}
+
                                                     </IconButton>
-                                                } 
+                                                }
                                             />
-                                            <Input 
-                                                variant="outline" 
+                                            <Input
+                                                variant="outline"
                                                 type='text'
                                                 background='#F0F0F5'
                                                 width='100%'
@@ -600,261 +693,262 @@ export function ComponentCadastro(props){
                                                 paddingRight='50px'
                                                 border='2px solid transparent'
                                                 boxSizing='border-box'
-                                                onInput={(e)=> setEndereco({...endereco, cep: e.target.value})}
+                                                onInput={(e) => setEndereco({ ...endereco, cep: e.target.value })}
                                                 value={endereco.cep}
 
                                             />
                                         </InputGroup>
-                                </FormControl>
-                            </Stack>
-                            <Stack
-                                spacing='20px'
-                                direction='row'
-                                margin='30px 0px 0px 0px'
-                            >
-                                <Button
-                                   color='#FFF'
-                                   padding='20px 40px'
-                                   maxHeight='50px'
-                                   maxWidth='400px'
-                                   width='300px'
-                                   minWidth='200px'
-                                   borderRadius='10px'
-                                   float='right'
-                                   fontWeight='bolder'
-                                   background='#2F80ED'
-                                   boxSizing='border-box'
-                                   cursor='pointer'
-                                    leftIcon={
-                                        !loaders.searchPosition
-                                        ? (<Image color='inherit' width='20px' height='20px' marginRight='10px' src={Local}/>)
-                                        : (<Spinner thickness="4px" color='inherit' width='20px' height='20px'  marginRight='10px'></Spinner>)
-                                    }
-                                    onClick={getLocationPoint}
-                                >
-                                    Obter localização atual
-                                </Button>
-                            </Stack>
-
-                        </Box>
-                        <Box>
-                            <Center
-                                background='#E1FAEC'
-                                borderRadius='5px'
-                                height='500px'
-                        >
-                            <Center
-                                width='80%'
-                                height='80%'
-                                borderRadius='10px'
-                                border='3px dashed #2AC28B'
-                                cursor='pointer'
-                                transition='all .5s'
-                                _hover={{
-                                    background:'rgba(150,150,150,0.3)'
-                                }}
-                                onClick={(event)=>{
-                                    const componentParent = event.currentTarget;
-                                    const componentFile = document.createElement('input');
-                                    componentFile.setAttribute('type','file');
-                                    componentFile.click();
-
-                                    componentFile.addEventListener('input', (e)=>{
-                                        const [file] =  e.target.files;
-                                        const readerFile = new FileReader();
-                                        readerFile.readAsText(file);
-
-                                        readerFile.addEventListener('load',(result)=>{
-                                            const componentBackground = document.createElement('div');        
-                                            Object.defineProperty(componentBackground,'style',{
-                                                value: {
-                                                    ...componentBackground.style,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    position: 'absolute',
-                                                    background: 'black' 
-                                                }
-                                            });
-
-                                            componentBackground.innerHTML = result.currentTarget.result;
-                                            componentParent.appendChild(componentBackground);
-                                            
-                                        })
-                                    })
-                                }}
-                            >
+                                    </FormControl>
+                                </Stack>
                                 <Stack
                                     spacing='20px'
-                                    direction='column'    
+                                    direction='row'
+                                    margin='30px 0px 0px 0px'
                                 >
-                                    <IconButton
-                                        background='transparent'
-                                        color='#2AC28B'
-                                        icon={
-                                            <DownloadIcon
-                                                height='25px'
-                                                width='auto' 
-                                            />
+                                    <Button
+                                        color='#FFF'
+                                        padding='20px 40px'
+                                        maxHeight='50px'
+                                        maxWidth='400px'
+                                        width='300px'
+                                        minWidth='200px'
+                                        borderRadius='10px'
+                                        float='right'
+                                        fontWeight='bolder'
+                                        background='#2F80ED'
+                                        boxSizing='border-box'
+                                        cursor='pointer'
+                                        leftIcon={
+                                            !loaders.searchPosition
+                                                ? (<Image color='inherit' width='20px' height='20px' marginRight='10px' src={Local} />)
+                                                : (<Spinner thickness="4px" color='inherit' width='20px' height='20px' marginRight='10px'></Spinner>)
                                         }
-                                    />
-                                    <Text
-                                        fontFamily={`'Roboto', sans-serif`}
-                                        color='#322153'
-                                        fontWeight='bold'
-                                        align='center'
+                                        onClick={getLocationPoint}
                                     >
-                                        Imagem do Estabelecimento
-                                    </Text>
+                                        Obter localização atual
+                                    </Button>
                                 </Stack>
-                            </Center>
-                        </Center>
-                        </Box>
-                        <Box>
-                            <Text
-                                fontSize='25px'
-                                fontWeight='bolder'
-                                color='#322153'
-                                fontFamily={` 'Ubuntu', sans-serif`}
-                                margin='0px 0px 30px 0px'
-                            >
-                                Composicao da Coleta
-                            </Text>
-                            <Wrap>
-                                <WrapItem
+
+                            </Box>
+                            <Box>
+                                <Center
                                     background='#E1FAEC'
-                                    width='calc(33.33% - 20px)'
                                     borderRadius='5px'
-                                    className='select-card'
-                                    style={Boolean(itensSelected.pilhas) ? classes.selectedItem : null}
-                                    onClick={()=>{
-                                        setItensSelected({
-                                            ...itensSelected,
-                                            pilhas: !itensSelected.pilhas
-                                        })
-                                    }}
+                                    height='500px'
                                 >
-                                    <Center 
-                                        width='100%'
-                                        padding='20px 0px 20px 0px'
+                                    <Center
+                                        width='80%'
+                                        height='80%'
+                                        borderRadius='10px'
+                                        border='3px dashed #2AC28B'
+                                        cursor='pointer'
+                                        transition='all .5s'
+                                        _hover={{
+                                            background: 'rgba(150,150,150,0.3)'
+                                        }}
+                                        onClick={(event) => {
+                                            const componentParent = event.currentTarget;
+                                            const componentFile = document.createElement('input');
+                                            componentFile.setAttribute('type', 'file');
+                                            componentFile.click();
+
+                                            componentFile.addEventListener('input', (e) => {
+                                                const [file] = e.target.files;
+                                                const readerFile = new FileReader();
+                                                readerFile.readAsText(file);
+
+                                                readerFile.addEventListener('load', (result) => {
+                                                    const componentBackground = document.createElement('div');
+                                                    Object.defineProperty(componentBackground, 'style', {
+                                                        value: {
+                                                            ...componentBackground.style,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            position: 'absolute',
+                                                            background: 'black'
+                                                        }
+                                                    });
+
+                                                    componentBackground.innerHTML = result.currentTarget.result;
+                                                    componentParent.appendChild(componentBackground);
+
+                                                })
+                                            })
+                                        }}
                                     >
                                         <Stack
-                                            direction='column'
                                             spacing='20px'
+                                            direction='column'
                                         >
-                                            <Image
-                                                boxSize="100px"
-                                                objectFit="cover"
-                                                src={ImagemLampadas}
-                                                alt="Lampadas"
+                                            <IconButton
+                                                background='transparent'
+                                                color='#2AC28B'
+                                                icon={
+                                                    <DownloadIcon
+                                                        height='25px'
+                                                        width='auto'
+                                                    />
+                                                }
                                             />
-                                            <Text 
-                                                align='center'
-                                                color='#322153'
+                                            <Text
                                                 fontFamily={`'Roboto', sans-serif`}
+                                                color='#322153'
+                                                fontWeight='bold'
+                                                align='center'
                                             >
-                                                Lampadas
+                                                Imagem do Estabelecimento
                                             </Text>
                                         </Stack>
                                     </Center>
-                                </WrapItem>
-                                <WrapItem
-                                     background='#E1FAEC'
-                                     width='calc(33.33% - 20px)'
-                                     borderRadius='5px'
-                                     className='select-card'
-                                     style={Boolean(itensSelected.lampadas) ? classes.selectedItem : null}
-                                        onClick={()=>{
+                                </Center>
+                            </Box>
+                            <Box>
+                                <Text
+                                    fontSize='25px'
+                                    fontWeight='bolder'
+                                    color='#322153'
+                                    fontFamily={` 'Ubuntu', sans-serif`}
+                                    margin='0px 0px 30px 0px'
+                                >
+                                    Composicao da Coleta
+                                </Text>
+                                <Wrap>
+                                    <WrapItem
+                                        background='#E1FAEC'
+                                        width='calc(33.33% - 20px)'
+                                        borderRadius='5px'
+                                        className='select-card'
+                                        style={Boolean(itensSelected.pilhas) ? classes.selectedItem : null}
+                                        onClick={() => {
+                                            setItensSelected({
+                                                ...itensSelected,
+                                                pilhas: !itensSelected.pilhas
+                                            })
+                                        }}
+                                    >
+                                        <Center
+                                            width='100%'
+                                            padding='20px 0px 20px 0px'
+                                        >
+                                            <Stack
+                                                direction='column'
+                                                spacing='20px'
+                                            >
+                                                <Image
+                                                    boxSize="100px"
+                                                    objectFit="cover"
+                                                    src={ImagemLampadas}
+                                                    alt="Lampadas"
+                                                />
+                                                <Text
+                                                    align='center'
+                                                    color='#322153'
+                                                    fontFamily={`'Roboto', sans-serif`}
+                                                >
+                                                    Lampadas
+                                                </Text>
+                                            </Stack>
+                                        </Center>
+                                    </WrapItem>
+                                    <WrapItem
+                                        background='#E1FAEC'
+                                        width='calc(33.33% - 20px)'
+                                        borderRadius='5px'
+                                        className='select-card'
+                                        style={Boolean(itensSelected.lampadas) ? classes.selectedItem : null}
+                                        onClick={() => {
                                             setItensSelected({
                                                 ...itensSelected,
                                                 lampadas: !itensSelected.lampadas
                                             })
                                         }}
-                                >
-                                    <Center
-                                        width='100%'
-                                        padding='20px 0px 20px 0px'
                                     >
-                                        <Stack
-                                            direction='column'
-                                            spacing='20px'
+                                        <Center
+                                            width='100%'
+                                            padding='20px 0px 20px 0px'
                                         >
-                                            <Image
-                                                src={ImagemPilhas}
-                                                boxSize="100px"
-                                                objectFit="cover"
-                                                alt='Pilhas e baterias' 
-                                            />
-                                            <Text 
-                                                align='center'
-                                                color='#322153'
-                                                fontFamily={`'Roboto', sans-serif`}
+                                            <Stack
+                                                direction='column'
+                                                spacing='20px'
                                             >
-                                                Pilhas e baterias
-                                            </Text>
-                                        </Stack>
-                                    </Center>
-                                </WrapItem>
-                                <WrapItem
-                                     background='#E1FAEC'
-                                     width='calc(33.33% - 20px)'
-                                     borderRadius='5px'
-                                     className='select-card'
-                                     style={Boolean(itensSelected.residuos) ? classes.selectedItem : null}
-                                    onClick={()=>{
-                                        setItensSelected({
-                                            ...itensSelected,
-                                            residuos: !itensSelected.residuos
-                                        })
-                                    }}
-                                >
-                                    <Center 
-                                        width='100%'
-                                        padding='20px 0px 20px 0px'
+                                                <Image
+                                                    src={ImagemPilhas}
+                                                    boxSize="100px"
+                                                    objectFit="cover"
+                                                    alt='Pilhas e baterias'
+                                                />
+                                                <Text
+                                                    align='center'
+                                                    color='#322153'
+                                                    fontFamily={`'Roboto', sans-serif`}
+                                                >
+                                                    Pilhas e baterias
+                                                </Text>
+                                            </Stack>
+                                        </Center>
+                                    </WrapItem>
+                                    <WrapItem
+                                        background='#E1FAEC'
+                                        width='calc(33.33% - 20px)'
+                                        borderRadius='5px'
+                                        className='select-card'
+                                        style={Boolean(itensSelected.residuos) ? classes.selectedItem : null}
+                                        onClick={() => {
+                                            setItensSelected({
+                                                ...itensSelected,
+                                                residuos: !itensSelected.residuos
+                                            })
+                                        }}
                                     >
-                                        <Stack
-                                            direction='column'
-                                            spacing='20px'
+                                        <Center
+                                            width='100%'
+                                            padding='20px 0px 20px 0px'
                                         >
-                                            <Image 
-                                                src={ImagemEletronicos}
-                                                boxSize="100px"
-                                                objectFit="cover"
-                                                alt='Eletronicos' 
-                                            />
-                                            <Text
-                                                align='center'
-                                                color='#322153'
-                                                fontFamily={`'Roboto', sans-serif`}
+                                            <Stack
+                                                direction='column'
+                                                spacing='20px'
                                             >
-                                                Residuos Eletronicos
-                                            </Text>
-                                        </Stack>
-                                    </Center>
-                                </WrapItem>
-                            </Wrap>
-                        </Box>
-                        <Box>
-                            <Button
-                                display='block'
-                                padding='20px 50px 20px 50px'
-                                color='#fff'
-                                background='#2AC28B'
-                                fontWeight='bolder'
-                                borderRadius='10px'
-                                fontSize='20px'
-                                float='right'
-                                boxShadow='0px 2px 2px 0px rgb(150,150,150)'
-                                className='button-submit'
-                            >
-                                Cadastrar ponto de coleta
-                            </Button>
-                        </Box>
-                    </Stack>
-                </form>
-            </Stack>
+                                                <Image
+                                                    src={ImagemEletronicos}
+                                                    boxSize="100px"
+                                                    objectFit="cover"
+                                                    alt='Eletronicos'
+                                                />
+                                                <Text
+                                                    align='center'
+                                                    color='#322153'
+                                                    fontFamily={`'Roboto', sans-serif`}
+                                                >
+                                                    Residuos Eletronicos
+                                                </Text>
+                                            </Stack>
+                                        </Center>
+                                    </WrapItem>
+                                </Wrap>
+                            </Box>
+                            <Box>
+                                <Button
+                                    type='submit'
+                                    display='block'
+                                    padding='20px 50px 20px 50px'
+                                    color='#fff'
+                                    background='#2AC28B'
+                                    fontWeight='bolder'
+                                    borderRadius='10px'
+                                    fontSize='20px'
+                                    float='right'
+                                    boxShadow='0px 2px 2px 0px rgb(150,150,150)'
+                                    className='button-submit'
+                                >
+                                    Cadastrar ponto de coleta
+                                </Button>
+                            </Box>
+                        </Stack>
+                    </form>
+                </Stack>
             </Center>
         </Container>
     )
