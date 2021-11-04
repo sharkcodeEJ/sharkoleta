@@ -31,7 +31,7 @@ class Point {
   }
 
   static create ({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens }: Point) {
-    const point = new Point({ name, email, description, whatsapp, fone, latitude, longitude, city, uf, address, district, number, cep, image, itens })
+    const point = new Point({ name: name.trim(), email, description: description.trim(), whatsapp, fone, latitude, longitude, city, uf, address: address.trim(), district: district.trim(), number, cep, image, itens })
     return point
   }
 }

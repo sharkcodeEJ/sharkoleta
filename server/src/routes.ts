@@ -1,6 +1,7 @@
 import { Router } from 'express'
-import { createPointsController } from '@modules/CreatePoint'
-import { findByIdPointController } from '@modules/FindByIdPoint'
+import { checkSchema, validationResult } from 'express-validator'
+import { createPointsController, createPoitRequestBodyValidator } from '@modules/CreatePoint'
+import { findByIdPointController, findByIdPoitRequestParamsValidator } from '@modules/FindByIdPoint'
 import { filterPointsController } from '@modules/FilterPoints'
 import { findStateController } from '@modules/FindStates'
 import { initialConfigController } from '@modules/InitialConfig'
@@ -11,17 +12,32 @@ routes.post('/config', (request, response) => {
   return initialConfigController.handle(request, response)
 })
 
-routes.post('/points', (request, response) => {
-  return createPointsController.handle(request, response)
-})
+routes.post(
+  '/points',
+  checkSchema(createPoitRequestBodyValidator),
+  (request, response) => {
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ errors: errors.array() })
+    }
+    return createPointsController.handle(request, response)
+  }
+)
 
 routes.get('/points', (request, response) => {
   return filterPointsController.handle(request, response)
 })
 
-routes.get('/points/:id', (request, response) => {
-  return findByIdPointController.handle(request, response)
-})
+routes.get('/points/:id',
+  checkSchema(findByIdPoitRequestParamsValidator),
+  (request, response) => {
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ errors: errors.array() })
+    }
+    return findByIdPointController.handle(request, response)
+  }
+)
 
 routes.get('/states', (request, response) => {
   return findStateController.handle(request, response)
