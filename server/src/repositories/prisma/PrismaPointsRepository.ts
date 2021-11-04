@@ -94,7 +94,7 @@ class PrismaPointsRepository implements IPointsRepositories {
   }
 
   async filter (uf?: string, city?: string, searchTerm?: string): Promise<Point[]> {
-    const searchOptions =  [
+    const searchOptions = [
       {
         name: {
           contains: searchTerm,
@@ -107,15 +107,15 @@ class PrismaPointsRepository implements IPointsRepositories {
           mode: 'insensitive'
         }
       }
-     ]
+    ]
 
-  let where = {
+    let where = {
       uf,
       city
     }
-  const customSearch = [ undefined, searchOptions ][Number(Boolean(searchTerm))]
-  where = Object.assign(where, customSearch)
-  
+    const customSearch = [undefined, searchOptions][Number(Boolean(searchTerm))]
+    where = Object.assign(where, customSearch)
+
     try {
       const points = await prisma.point.findMany({
         where,
