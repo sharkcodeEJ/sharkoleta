@@ -1,11 +1,14 @@
 package com.mobile;
 
+
+import com.github.wumke.RNExitApp.RNExitAppPackage;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.github.wumke.RNExitApp.RNExitAppPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;

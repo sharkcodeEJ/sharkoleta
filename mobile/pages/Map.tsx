@@ -3,7 +3,7 @@ import { useFonts, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { vw, vh } from 'react-native-expo-viewport-units';
 import { StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { color } from 'react-native-reanimated';
+import Geolocation from '@react-native-community/geolocation'
 
 
 
@@ -14,24 +14,41 @@ export default function Map(props: any ){
     });
 
 
-const [counterMarker, setCounterMarker] = useState(0);
 const [markers = [], setMarkers] = useState();
+const [initLatitude, setInitLatitude] = useState(props.route.params.initLatitude);
+const [initLongitude, setInitLongitude] = useState(props.route.params.initLongitude);
 
 
 useEffect(()=> {
     async function resMarkers(){
         let markersTemp =  await props.route.params.body;
         
-         setMarkers(await markersTemp)
+        setMarkers(await markersTemp)
         
     }
 
     resMarkers();
 }, [])
 
-console.log("MAP:" + markers)
+if(props.route.params.latitude == 0 || props.route.params.longitude == 0){
+    alert("Problemas ao obter localização do usuário.\nO sistema de rotas pode apresentar falhas!")
+    console.log("Entrou no IF")
+        Geolocation.getCurrentPosition((pos)=>{
+        setInitLatitude(pos.coords.latitude)
+        setInitLongitude(pos.coords.longitude)
 
 
+    console.log('latitude:' + initLatitude);
+    console.log('longitude:' + initLongitude);
+}, 
+(erro) => {
+    console.log('Erro: ' + erro.message)
+    // alert("Erro ao obter localização do usuário!\n Reinicie o aplicativo para corrigir esse problema!");
+}
+, {
+    enableHighAccuracy: false, timeout: 10000, maximumAge:10000
+});
+}
 
     return(
         <View style={css.container}>
@@ -43,28 +60,27 @@ console.log("MAP:" + markers)
             <MapView 
             style={css.mapStyle}
             initialRegion={{
-                latitude: -28.495696340879743,
-                longitude: -49.01386381255002,
+                latitude: props.route.params.latitude,
+                longitude: props.route.params.longitude,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
             }}
             >
-                {markers.map(({id, name, markerLatitude, markerLongitude, type, description, whatsapp, number, city, uf, address, district, image, itens}) => {
-                    return <Marker
+                {markers.map(({id, name, latitude, longitude, description, whatsapp, number, city, uf, address, district, image, itens}) => {
+                    return console.log("aqui"), <Marker
                     style={css.marker}
                         key={id}
-                        coordinate={{ latitude : markerLatitude , longitude : markerLongitude }}
+                        coordinate={{ latitude : latitude , longitude : longitude }}
                         title={name}
-                        image= {(type == 1 ) ? require('../img/map_marker.png') : 
-                                (type == 2 ) ? require('../img/marker_two.png') :
-                                 require('../img/marker_three.png')}
+                        image= {(itens.length > 1) ? require('../img/map_marker.png') :
+                                (itens[0].title == "Eletrônicos") ? require('../img/marker_trash.png') : require('../img/marker_oil.png')}
                         >
                             <Callout tooltip
                             onPress={() => props.navigation.navigate('Place', {
                                 name: name,
                                 id: id,
-                                latitude: markerLatitude,
-                                longitude: markerLongitude,
+                                latitude: latitude,
+                                longitude: longitude,
                                 description: description, 
                                 whatsapp: whatsapp, 
                                 number: number, 
@@ -73,7 +89,9 @@ console.log("MAP:" + markers)
                                 address: address, 
                                 district: district, 
                                 image: image,
-                                itens: itens
+                                itens: itens,
+                                initLatitude: initLatitude,
+                                initLongitude: initLongitude
                             })}>
                                 <View >
                                     <View style={css.bubble}>
@@ -85,10 +103,7 @@ console.log("MAP:" + markers)
                                 </View> 
                             </Callout>
                         </Marker>
-
-                        
                 })}
-
             </MapView>
         </View>
     )
