@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { vw, vh } from 'react-native-expo-viewport-units';
 import { useFonts, Poppins_500Medium } from '@expo-google-fonts/poppins';
-import {  Text, View, TouchableOpacity, StyleSheet, Image, Button } from 'react-native';
+import {  Text, View, TouchableOpacity, StyleSheet, Image, BackHandler } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-
+import RNExitApp from 'react-native-exit-app';
+import Geolocation from '@react-native-community/geolocation'
 
 
 export default function Search( props: any )
 {
 
 
+    function handleBackButtonClick() {
+        RNExitApp.exitApp();
+        return true;
+      }
+    
+      useEffect(() => {
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        return () => {
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        };
+      }, []);
+    
 
 
 useFonts({
@@ -20,18 +33,42 @@ const [state, setState] = useState();
 const [city, setCity] = useState(0);
 const [resEstados=[], setResEstados] = useState()
 const [markers=[], setMarkers] = useState(false);
+const [initLatitude, setInitLatitude] = useState(0);
+const [initLongitude, setInitLongitude] = useState(0);
+
+
+
 
 
 useEffect(() => {
     function goToMap() {
         props.navigation.navigate('Map', {
-            body: markers
-        
+            body: markers,
+            latitude: markers[0].latitude,
+            longitude: markers[0].longitude,
+            initLatitude: initLatitude,
+            initLongitude: initLongitude
         })
     }
 
+    Geolocation.getCurrentPosition((pos)=>{
+        setInitLatitude(pos.coords.latitude)
+        setInitLongitude(pos.coords.longitude)
+
+    console.log('latitude:' + initLatitude);
+    console.log('longitude:' + initLongitude);
+}, 
+(erro) => {
+    console.log('Erro: ' + erro.message)
+    // alert("Sua localização está desativada!")
+}
+, {
+    enableHighAccuracy: false, timeout: 20000, maximumAge:60000
+});
+
     if(markers != false)
 {
+        // alert("Latitude: " + initLatitude + "\nLongitude:" + initLongitude)
         goToMap();
 }
 
@@ -40,8 +77,8 @@ useEffect(() => {
 
 useEffect(()=> {
     async function sendServer(){
-        let response = await fetch('http://192.168.0.112:3032/estados', {
-            method: 'POST',
+        let response = await fetch('https://sharkcoleta-web.azurewebsites.net/states', {
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -62,29 +99,32 @@ useEffect(()=> {
 // console.log(estadosRes.name);
 
 
-resEstados.map(({name, cidades}) => {
-    // console.log("Estado: " + name)
-    cidades.map(({name}) => {
-    // console.log("Cidade: " + name)
-})
-})
+// resEstados.map(({name, cities}) => {
+//     console.log("Estado: " + name);
+//     cities.map(({name}) => {
+//     console.log("Cidade: " + name)
+//     })
+// })
 
-
+// let teste = "pesquisa";
 
 async function sendForm(){
-    let markersResponse = await fetch('http://192.168.0.112:3032/pesquisa', {
-    method: 'POST',
+    let markersResponse = await fetch('https://sharkcoleta-web.azurewebsites.net/points?uf=' + state + "&city=" + city, {
+    method: 'GET',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        estado: state,
-        cidade: city
-      })
+    }
+    // ,
+    // body: JSON.stringify({
+    //     uf: state,
+    //     city: city
+    //   })
 })
 
  setMarkers(await markersResponse.json())
+
+    console.log("MARKERS" + markers)
 
 }
 
@@ -100,26 +140,26 @@ let dataCity = [];
 
 on = false;
 
-resEstados.map(({name, cidades}) => {
+resEstados.map(({name, cities}) => {
     if(state == name)
     {
         on= true;
-        for(let i=0; i< cidades.length; i++)
+        for(let i=0; i< cities.length; i++)
         {
-            dataCity.push(cidades[i].name)
+            dataCity.push(cities[i].name)
         }
 
-        for (let i=0; i< cidades.length; i++)
+        for (let i=0; i< cities.length; i++)
         {
-            if(cidades[i].name == city)
+            if(cities[i].name == city)
             {
                 buttonEnable = true;
 
             }
         }
         console.log("BUTTONENABLE: " + buttonEnable)
-        console.log("ESTADO ATUAL: " + state)
-        console.log("CIDADE ATUAL: " + city)
+        // console.log("ESTADO ATUAL: " + state)
+        // console.log("CIDADE ATUAL: " + city)
     }
 })
 
@@ -134,7 +174,7 @@ resEstados.map(({name, cidades}) => {
                 source={require('../img/recic.png')}
             />
                 <View style={css.headerBox}>
-                    <Text style={css.titlePage}>Seu marketplace</Text>
+                    <Text style={css.titlePage}>Seu ponto</Text>
                     <Text style={css.titlePage}>de coleta de</Text>
                     <Text style={css.titlePage}>resíduos </Text>
                 </View>

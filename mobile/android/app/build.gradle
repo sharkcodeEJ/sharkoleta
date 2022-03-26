@@ -135,8 +135,8 @@ android {
         applicationId "com.sharkcode.sharkoleta"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.7"
+        versionCode 61
+        versionName "6.1"
     }
     splits {
         abi {
@@ -193,6 +193,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-exit-app')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules

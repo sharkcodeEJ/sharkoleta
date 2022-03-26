@@ -1,36 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import { vw, vh } from 'react-native-expo-viewport-units';
-import { StyleSheet, View, Text, Linking, Image, ScrollView, TouchableOpacity, ImageComponent } from 'react-native';
-import Local from '@react-native-community/geolocation'
-// import {  TouchableOpacity } from 'react-native-gesture-handler';
+import { PermissionsAndroid, Platform, StyleSheet, View, Text, Linking, Image, ScrollView, TouchableOpacity, ImageComponent } from 'react-native';
+import Geolocation from '@react-native-community/geolocation'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
 export default function Map(props: any ){
 
-    const [InitialLatitude, setLatitude] = useState(0);
-    const [InitialLongitude, setLongitude] = useState(0);
+    // const [InitialLatitude, setLatitude] = useState(0);
+    // const [InitialLongitude, setLongitude] = useState(0);
+
     
-
-    useEffect(()=>{
-        
-        Local.getCurrentPosition((pos)=>{
-            setLatitude(pos.coords.latitude)
-            setLongitude(pos.coords.longitude)
-            console.log('asd');
-        }, 
-        (erro) => {
-            alert('Erro: ' + erro.message)
-        }
-        , {
-            enableHighAccuracy: true, timeout: 120000, maximumAge:1000
-        });
-    });
-
-    // const teste = 'https://reactnative.dev/img/tiny_logo.png' or https://www.rocketseat.com.br/_next/image?url=https%3A%2F%2Fmedia.graphcms.com%2F4hbvOcc4QyqxtxvBLyyK&w=640&q=100
-
-    const a = true;
 
     return(
         <SafeAreaView style={css.container}>
@@ -38,7 +19,7 @@ export default function Map(props: any ){
             <ScrollView >
 
                 <View >
-                    <Image style={css.photo} source={require('../img/place_photo.png')}/>
+                    <Image style={css.photo} source={{ uri: props.route.params.image}}/>
                     <Text style={css.name}>{props.route.params.name}</Text>
                     <Text style={css.description}>{props.route.params.description}</Text>
                     <Text style={css.address}>Endereço</Text>
@@ -50,18 +31,15 @@ export default function Map(props: any ){
                         {props.route.params.itens.map(({image, id, title}) => {
                             return <Image 
                                     key={id}
-                                    source={(title == 'oleo') ? require('../img/oleo.png') : require('../img/lixo_eletronico.png')}/>
+                                    source={(title == 'Óleo') ? require('../img/oleo.png') : require('../img/lixo_eletronico.png')}/>
                         })}
                     </View>
                         
                     
                     <View style={css.footer}>
-
-
-
                         <View style={css.buttons}>
                             <View>
-                                <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/dir/?api=1&origin=' +InitialLatitude + ',' + InitialLongitude + '&destination=' + props.route.params.latitude +  ',' + props.route.params.longitude)} >
+                                <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/dir/?api=1&origin=' + props.route.params.initLatitude + ',' + props.route.params.initLongitude + '&destination=' + props.route.params.latitude +  ',' + props.route.params.longitude)} >
                                     <Image
                                         
                                         source={require('../img/go_button.png')}
@@ -70,7 +48,7 @@ export default function Map(props: any ){
                             </View>
 
                             <View>
-                                <TouchableOpacity style={{marginLeft: 15}} onPress={() => Linking.openURL('https://api.whatsapp.com/send?phone=5548996767825&text=Hello%20World')} >
+                                <TouchableOpacity style={{marginLeft: 15}} onPress={() => Linking.openURL('https://api.whatsapp.com/send?phone=' + props.route.params.whatsapp)} >
                                     <Image
                                         
                                         source={require('../img/whatsapp_button.png')}
