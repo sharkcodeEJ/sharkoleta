@@ -16,19 +16,11 @@ import {
     InputGroup,
     InputRightElement,
     Heading,
-    AspectRatio,
-    Select,
     List,
-    ListItem,
-    transition,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    Menu,
-    Link
+    ListItem
  } from "@chakra-ui/react"
 
-import {ArrowBackIcon,SearchIcon,ChevronDownIcon,HamburgerIcon, PhoneIcon, Search2Icon, InfoIcon} from "@chakra-ui/icons"
+import {SearchIcon, Search2Icon, InfoIcon} from "@chakra-ui/icons"
 
 import ImagemLampadas from '../cadastro/imgs/lampadas.svg';
 import ImagemPilhas from '../cadastro/imgs/baterias.svg';
@@ -39,9 +31,6 @@ import ListaTempo from './imgs/relogio.svg';
 import Axios from 'axios';
 import {Map,Marker,TileLayer,Popup} from 'react-leaflet';
 import '../../global.css';
-import Us from './imgs/us.svg'
-import Home from './imgs/home.svg'
-import Search from './imgs/search.svg'
 import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
 const dadosFake = [
@@ -83,7 +72,6 @@ function ComponentCardsPesquisa({data, onSelected}){
             margin='20px'
             padding='10px'
             boxSizing='border-box'
-            background='#F2F2F2'
             border='2px solid #2AC28B'
             borderRadius='10px'
             cursor='pointer'
@@ -328,16 +316,15 @@ export function ComponentBusca(props){
                 overflow='auto'
             >
                 <Heading
-                        display='block'
-                        fontSize='35px'
-                        textAlign='center'
-                        as="h1"
-                        fontFamily={`'Ubuntu', sans-serif`}
-                        color='#2AC28B'
-                        padding='20px'
-
+                    display='block'
+                    fontSize='35px'
+                    textAlign='center'
+                    as="h1"
+                    fontFamily={`'Ubuntu', sans-serif`}
+                    color='#2AC28B'
+                    padding='20px'
                 >
-                        Procura de pontos
+                    Procura de pontos
                 </Heading>
                 <Stack
                     width='900px'
@@ -602,23 +589,6 @@ export function ComponentBusca(props){
                                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                {/*
-                                    VERIFICAR VERSAO NOVA PARA ADICIONAR MAIS E UM MARCADOR
-                                {
-                                    dadosFake.map(dataPoint => {
-                                        return (
-                                            <>
-                                                <Marker 
-                                                    position={dataPoint.localizacao.localidade}
-                                                >
-                                                    <Popup>
-                                                        {dataPoint.nome}
-                                                    </Popup>
-                                                </Marker>
-                                            </>
-                                        )
-                                    })
-                                } */}
                                 <Marker 
                                     position={pointSelected}
                                 >
@@ -636,6 +606,5 @@ export function ComponentBusca(props){
         </Container>
     )
 }
-
 
 export default ComponentBusca;

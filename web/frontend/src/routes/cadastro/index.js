@@ -20,28 +20,19 @@ import {
     InputGroup,
     InputRightElement,
     Heading,
-    Spinner,
-    MenuList,
-    Menu,
-    MenuItem,
-    MenuButton
+    Spinner
 } from "@chakra-ui/react";
 
 import { Map, Marker, TileLayer, Popup } from 'react-leaflet';
 
-import { DownloadIcon, SearchIcon, HamburgerIcon } from "@chakra-ui/icons"
+import { DownloadIcon, SearchIcon } from "@chakra-ui/icons"
 import ImagemLampadas from './imgs/lampadas.svg';
 import ImagemPilhas from './imgs/baterias.svg';
 import ImagemEletronicos from './imgs/eletronicos.svg';
 import Local from '../dadosColeta/imgs/Group.svg';
-import Us from './imgs/us.svg'
-import Home from './imgs/home.svg'
-import Search from './imgs/search.svg'
 import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
 export function ComponentCadastro(props) {
-
-    const marginImage = '0px 40px 0px 0px';
 
     const classes = {
         selectedItem: {
@@ -195,9 +186,7 @@ export function ComponentCadastro(props) {
 
     async function sendData(event) {
         event.preventDefault();
-
-        alert("Dados: " + dados.name);
-
+        alert("Dados: " + dados);
 
         try {
             await api.post('points', { dados }).then((result) => {
@@ -266,9 +255,7 @@ export function ComponentCadastro(props) {
                         fontFamily={`'Ubuntu', sans-serif`}
                         color='#2AC28B'
                         padding='20px'
-
                     >
-
                         Dados
                     </Heading>
 
@@ -541,7 +528,6 @@ export function ComponentCadastro(props) {
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.numero}
-
                                         />
                                     </FormControl>
                                 </Stack>
@@ -572,7 +558,6 @@ export function ComponentCadastro(props) {
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.rua}
-
                                         />
                                     </FormControl>
                                     <FormControl
@@ -627,7 +612,6 @@ export function ComponentCadastro(props) {
                                                 boxSizing='border-box'
                                                 onInput={(e) => setEndereco({ ...endereco, cep: e.target.value })}
                                                 value={endereco.cep}
-
                                             />
                                         </InputGroup>
                                     </FormControl>
@@ -660,7 +644,6 @@ export function ComponentCadastro(props) {
                                         Obter localização atual
                                     </Button>
                                 </Stack>
-
                             </Box>
                             <Box>
                                 <Center
@@ -706,7 +689,6 @@ export function ComponentCadastro(props) {
 
                                                     componentBackground.innerHTML = result.currentTarget.result;
                                                     componentParent.appendChild(componentBackground);
-
                                                 })
                                             })
                                         }}
@@ -885,6 +867,5 @@ export function ComponentCadastro(props) {
         </Container>
     )
 }
-
 
 export default ComponentCadastro
