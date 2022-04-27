@@ -331,7 +331,7 @@ export function ComponentBusca(props){
                     direction='column'
                     spacing='25px'
                 >
-                    <Box>
+                    {/* <Box>
                         <Box
                             display='flex'
                             justifyContent='space-between'
@@ -515,7 +515,7 @@ export function ComponentBusca(props){
                         >
                             Buscar
                         </Button>
-                    </Box>
+                    </Box> */}
                     <Box>
                         <Text
                             margin='50px 0px 25px 0px'
