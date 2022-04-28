@@ -76,10 +76,8 @@ export function ComponentPerfil(props){
     const [points, setPoints] = useState([]);
 
     let urlId = window.location.search.substring(4).split('&');
-    console.log("url: "+ urlId);
 
     useEffect(() => {
-        console.log("teaste");
         api.get(`points/${urlId}`, {}).then (response => {
             setPoints(response.data);
         })

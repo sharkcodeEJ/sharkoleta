@@ -54,10 +54,8 @@ function ComponentCardsPesquisa({data, onSelected}){
     const [points, setPoints] = useState([]);
 
     useEffect(() => {
-        console.log("teaste");
         api.get('points', {}).then (response => {
             setPoints(response.data);
-            console.log("REsponse: " + response.data);
         })
     }, [])
 
@@ -66,7 +64,6 @@ function ComponentCardsPesquisa({data, onSelected}){
         {points.map(point =>(
             <Stack
             width='calc(50% - 100px)'
-            background='red'
             direction='column'
             spacing='25px'
             margin='20px'
