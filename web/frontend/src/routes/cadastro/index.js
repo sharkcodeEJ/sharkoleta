@@ -20,27 +20,19 @@ import {
     InputGroup,
     InputRightElement,
     Heading,
-    Spinner,
-    MenuList,
-    Menu,
-    MenuItem,
-    MenuButton
+    Spinner
 } from "@chakra-ui/react";
 
 import { Map, Marker, TileLayer, Popup } from 'react-leaflet';
 
-import { DownloadIcon, SearchIcon, HamburgerIcon } from "@chakra-ui/icons"
+import { DownloadIcon, SearchIcon } from "@chakra-ui/icons"
 import ImagemLampadas from './imgs/lampadas.svg';
 import ImagemPilhas from './imgs/baterias.svg';
 import ImagemEletronicos from './imgs/eletronicos.svg';
 import Local from '../dadosColeta/imgs/Group.svg';
-import Us from './imgs/us.svg'
-import Home from './imgs/home.svg'
-import Search from './imgs/search.svg'
+import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
 export function ComponentCadastro(props) {
-
-    const marginImage = '0px 40px 0px 0px';
 
     const classes = {
         selectedItem: {
@@ -194,9 +186,7 @@ export function ComponentCadastro(props) {
 
     async function sendData(event) {
         event.preventDefault();
-
-        alert("Dados: " + dados.name);
-
+        alert("Dados: " + dados);
 
         try {
             await api.post('points', { dados }).then((result) => {
@@ -230,81 +220,12 @@ export function ComponentCadastro(props) {
                 padding='5px'
                 zIndex={1000}
             >
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HamburgerIcon width='25px' height='auto' />}
-                        variant="outline"
-                        padding='20px'
-                        margin='0px 0px 0px 50px'
-                        background='transparent'
-                        cursor='pointer'
-                        color='#FFF'
-                        border='2px solid #49d085'
-                        transition='all .2s'
-                        _hover={{
-                            background: 'rgb(0,0,0,0.3)'
-                        }}
-                    />
-                    <MenuList
-                        maxWidth='500px'
-                        minWidth='300px'
-                        width='400px'
-                        background='#1a653c'
-                        color='#d6f5e4'
-                        //fontWeight='400'
-                        fontSize='18px'
+                <Image 
+                    src={SharkcoletaLogo} 
+                    alt='Logo do projeto Sharkcoleta'
+                    marginLeft='40px'
+                ></Image>
 
-                    >
-                        <MenuItem
-                            padding='20px'
-                            fontWeight='550'
-                            fontSize='inherit'
-                            letterSpacing='2px'
-                            background='inherit'
-                            transition='all .2s'
-                            cursor='pointer'
-                            _hover={{
-                                background: '#e6e6e6',
-                                color: '#1a653c'
-                            }}
-                        >
-                            <Image margin={marginImage} color='#FFF' src={Home} />
-                            Inicio
-                        </MenuItem>
-                        <MenuItem
-                            padding='20px'
-                            background='inherit'
-                            fontWeight='550'
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background: '#e6e6e6',
-                                color: '#1a653c'
-                            }}
-                        >
-                            <Image margin={marginImage} color='#FFF' src={Us} />
-                            Junte-se a nos
-                        </MenuItem>
-                        <MenuItem
-                            padding='20px'
-                            background='inherit'
-                            fontWeight='550'
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background: '#e6e6e6',
-                                color: '#1a653c'
-                            }}
-                        >
-                            <Image margin='0px 40px 0px 0px' color='#FFF' src={Search} />
-                            Localizar
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
                 <Text
                     fontSize='25px'
                     color='#e6e6e6'
@@ -334,9 +255,7 @@ export function ComponentCadastro(props) {
                         fontFamily={`'Ubuntu', sans-serif`}
                         color='#2AC28B'
                         padding='20px'
-
                     >
-
                         Dados
                     </Heading>
 
@@ -609,7 +528,6 @@ export function ComponentCadastro(props) {
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.numero}
-
                                         />
                                     </FormControl>
                                 </Stack>
@@ -640,7 +558,6 @@ export function ComponentCadastro(props) {
                                             padding='20px'
                                             boxSizing='border-box'
                                             value={endereco.rua}
-
                                         />
                                     </FormControl>
                                     <FormControl
@@ -695,7 +612,6 @@ export function ComponentCadastro(props) {
                                                 boxSizing='border-box'
                                                 onInput={(e) => setEndereco({ ...endereco, cep: e.target.value })}
                                                 value={endereco.cep}
-
                                             />
                                         </InputGroup>
                                     </FormControl>
@@ -728,7 +644,6 @@ export function ComponentCadastro(props) {
                                         Obter localização atual
                                     </Button>
                                 </Stack>
-
                             </Box>
                             <Box>
                                 <Center
@@ -774,7 +689,6 @@ export function ComponentCadastro(props) {
 
                                                     componentBackground.innerHTML = result.currentTarget.result;
                                                     componentParent.appendChild(componentBackground);
-
                                                 })
                                             })
                                         }}
@@ -953,6 +867,5 @@ export function ComponentCadastro(props) {
         </Container>
     )
 }
-
 
 export default ComponentCadastro

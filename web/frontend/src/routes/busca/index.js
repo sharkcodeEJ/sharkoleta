@@ -16,19 +16,11 @@ import {
     InputGroup,
     InputRightElement,
     Heading,
-    AspectRatio,
-    Select,
     List,
-    ListItem,
-    transition,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    Menu,
-    Link
+    ListItem
  } from "@chakra-ui/react"
 
-import {ArrowBackIcon,SearchIcon,ChevronDownIcon,HamburgerIcon, PhoneIcon, Search2Icon, InfoIcon} from "@chakra-ui/icons"
+import {SearchIcon, Search2Icon, InfoIcon} from "@chakra-ui/icons"
 
 import ImagemLampadas from '../cadastro/imgs/lampadas.svg';
 import ImagemPilhas from '../cadastro/imgs/baterias.svg';
@@ -39,9 +31,7 @@ import ListaTempo from './imgs/relogio.svg';
 import Axios from 'axios';
 import {Map,Marker,TileLayer,Popup} from 'react-leaflet';
 import '../../global.css';
-import Us from './imgs/us.svg'
-import Home from './imgs/home.svg'
-import Search from './imgs/search.svg'
+import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
 const dadosFake = [
     {
@@ -64,10 +54,8 @@ function ComponentCardsPesquisa({data, onSelected}){
     const [points, setPoints] = useState([]);
 
     useEffect(() => {
-        console.log("teaste");
         api.get('points', {}).then (response => {
             setPoints(response.data);
-            console.log("REsponse: " + response.data);
         })
     }, [])
 
@@ -76,13 +64,11 @@ function ComponentCardsPesquisa({data, onSelected}){
         {points.map(point =>(
             <Stack
             width='calc(50% - 100px)'
-            background='red'
             direction='column'
             spacing='25px'
             margin='20px'
             padding='10px'
             boxSizing='border-box'
-            background='#F2F2F2'
             border='2px solid #2AC28B'
             borderRadius='10px'
             cursor='pointer'
@@ -303,83 +289,12 @@ export function ComponentBusca(props){
                 padding='5px'
                 zIndex={1000}
             >
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HamburgerIcon width='25px' height='auto'/>}
-                        variant="outline"
-                        padding='20px'
-                        margin='0px 0px 0px 50px'
-                        background='transparent'
-                        cursor='pointer'
-                        color='#FFF'
-                        
-                        border='2px solid #49d085'
-                        transition='all .2s'
-                        _hover={{
-                            background:'rgb(0,0,0,0.3)'
-                        }}
-                    />
-                    <MenuList 
-                        maxWidth='500px' 
-                        minWidth='300px' 
-                        width='400px'
-                        background='#1a653c'
-                        color='#d6f5e4'
-                        //fontWeight='400'
-                        fontSize='18px'
-                        
-                    >
-                        <MenuItem 
-                            padding='20px' 
-                            fontWeight='550' 
-                            fontSize='inherit'
-                            letterSpacing='2px'
-                            background='inherit'
-                            transition='all .2s'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Home}/>
-                            Inicio
-                        </MenuItem>
-                        <MenuItem 
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Us}/>
-                            Junte-se a nos
-                        </MenuItem>
-                        <MenuItem  
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 40px 0px 0px' color='#FFF' src={Search}/>
-                            Localizar
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
-
+                <Image 
+                    src={SharkcoletaLogo} 
+                    alt='Logo do projeto Sharkcoleta'
+                    marginLeft='40px'
+                ></Image>
+                
                 <Text
                     fontSize='25px'
                     color='#e6e6e6'
@@ -398,23 +313,22 @@ export function ComponentBusca(props){
                 overflow='auto'
             >
                 <Heading
-                        display='block'
-                        fontSize='35px'
-                        textAlign='center'
-                        as="h1"
-                        fontFamily={`'Ubuntu', sans-serif`}
-                        color='#2AC28B'
-                        padding='20px'
-
+                    display='block'
+                    fontSize='35px'
+                    textAlign='center'
+                    as="h1"
+                    fontFamily={`'Ubuntu', sans-serif`}
+                    color='#2AC28B'
+                    padding='20px'
                 >
-                        Procura de pontos
+                    Procura de pontos
                 </Heading>
                 <Stack
                     width='900px'
                     direction='column'
                     spacing='25px'
                 >
-                    <Box>
+                    {/* <Box>
                         <Box
                             display='flex'
                             justifyContent='space-between'
@@ -598,7 +512,7 @@ export function ComponentBusca(props){
                         >
                             Buscar
                         </Button>
-                    </Box>
+                    </Box> */}
                     <Box>
                         <Text
                             margin='50px 0px 25px 0px'
@@ -672,23 +586,6 @@ export function ComponentBusca(props){
                                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                {/*
-                                    VERIFICAR VERSAO NOVA PARA ADICIONAR MAIS E UM MARCADOR
-                                {
-                                    dadosFake.map(dataPoint => {
-                                        return (
-                                            <>
-                                                <Marker 
-                                                    position={dataPoint.localizacao.localidade}
-                                                >
-                                                    <Popup>
-                                                        {dataPoint.nome}
-                                                    </Popup>
-                                                </Marker>
-                                            </>
-                                        )
-                                    })
-                                } */}
                                 <Marker 
                                     position={pointSelected}
                                 >
@@ -706,6 +603,5 @@ export function ComponentBusca(props){
         </Container>
     )
 }
-
 
 export default ComponentBusca;

@@ -2,9 +2,6 @@ import React,{useEffect, useState} from 'react';
 import api from '../../services/api';
 import { 
     Container, 
-    Input,
-    FormControl,
-    FormLabel,
     Box,
     Stack,
     Divider,
@@ -12,75 +9,22 @@ import {
     Image,
     Button,
     Text,    
-    IconButton,
-    Spinner,
-    InputGroup,
-    InputRightElement,
     Heading,
-    AspectRatio,
     List,
     ListItem,
     ListIcon,
-    UnorderedList,
-    AlertDialog,
-    AlertDialogHeader,
-    AlertDialogBody,
-    AlertDialogFooter,
-    AlertDialogOverlay,
-    AlertDialogContent,
-    MenuList,
-    MenuItem,
-    Menu,
-    MenuButton,
-    Link
+    UnorderedList
  } from "@chakra-ui/react"
 
-import {ArrowBackIcon,SearchIcon,PhoneIcon,TimeIcon,HamburgerIcon, InfoIcon, EmailIcon} from "@chakra-ui/icons"
+import {PhoneIcon, InfoIcon, EmailIcon} from "@chakra-ui/icons"
 
-import Tel from './imgs/tel.svg';
 import Local from './imgs/Group.svg';
 import Wpp from './imgs/Whatsapp.svg';
 import Email from './imgs/E-mail.svg';
-import LocalGoogle from './imgs/LocalGoogle.png';
-import Home from './imgs/home.svg'
-import Search from './imgs/search.svg';
-import Us from './imgs/us.svg'
 import REMOVER from './imgs/backgroundREMOVER.svg'
-
-
-function ComponentEmail({onClose,open=true}){
-    return (
-        <AlertDialog
-        isOpen={true}
-        onClose={onClose}
-        
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete Customer
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Are you sure? You can't undo this action afterwards.
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme="red" onClick={onClose} ml={3}>
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-    )
-}
+import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
 export function ComponentPerfil(props){
-    const [openDialogEmail,setOpenDialogEmail] = useState(false);
     const [data, setData] = useState({
         localizacao:{
             endereco:'',
@@ -118,7 +62,6 @@ export function ComponentPerfil(props){
         $componentLink.click();
     }
 
-
     function getLocationPoint(){
         window.navigator.geolocation.getCurrentPosition(resolve =>{
             const {latitude,longitude} = resolve.coords; 
@@ -126,26 +69,19 @@ export function ComponentPerfil(props){
         });
     }
 
-
     useEffect(()=>{
         getLocationPoint();
     },[])
 
     const [points, setPoints] = useState([]);
 
-    console.log("Points????????: " + points.name);
-
     let urlId = window.location.search.substring(4).split('&');
-    console.log("url: "+ urlId);
 
     useEffect(() => {
-        console.log("teaste");
         api.get(`points/${urlId}`, {}).then (response => {
             setPoints(response.data);
         })
     }, [])
-
-
 
     return (
     <>  
@@ -168,81 +104,11 @@ export function ComponentPerfil(props){
                 padding='5px'
                 zIndex={1000}
             >
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HamburgerIcon width='25px' height='auto'/>}
-                        variant="outline"
-                        padding='20px'
-                        margin='0px 0px 0px 50px'
-                        background='transparent'
-                        cursor='pointer'
-                        color='#FFF'
-                        border='2px solid #49d085'
-                        transition='all .2s'
-                        _hover={{
-                            background:'rgb(0,0,0,0.3)'
-                        }}
-                    />
-                    <MenuList 
-                        maxWidth='500px' 
-                        minWidth='300px' 
-                        width='400px'
-                        background='#1a653c'
-                        color='#d6f5e4'
-                        fontWeight='bolder'
-                        fontSize='18px'
-                        
-                    >
-                        <MenuItem 
-                            padding='20px' 
-                            fontWeight='550' 
-                            fontSize='inherit'
-                            letterSpacing='2px'
-                            background='inherit'
-                            transition='all .2s'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Home}/>
-                            Inicio
-                        </MenuItem>
-                        <MenuItem 
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 10px' margin ='0px 40px 0px 0px' color='#FFF' src={Us}/>
-                            Junte-se a nos
-                        </MenuItem>
-                        <MenuItem  
-                            padding='20px' 
-                            background='inherit' 
-                            fontWeight='550' 
-                            letterSpacing='2px'
-                            fontSize='inherit'
-                            cursor='pointer'
-                            _hover={{
-                                background:'#e6e6e6',
-                                color:'#1a653c'
-                            }}
-                        >
-                            <Image margin ='0px 40px 0px 0px' color='#FFF' src={Search}/>
-                            Localizar
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
+                <Image 
+                    src={SharkcoletaLogo} 
+                    alt='Logo do projeto Sharkcoleta'
+                    marginLeft='40px'
+                ></Image>
 
                 <Text
                     fontSize='25px'
@@ -271,7 +137,6 @@ export function ComponentPerfil(props){
                         color='#2AC28B'
                         padding='20px'
                         margin='0px 0px 40px 0px'
-
                 >
                     {points.name}
                 </Heading>
@@ -289,8 +154,7 @@ export function ComponentPerfil(props){
                             width='100%'
                             height='auto'
                             src={REMOVER}
-                        />
-                        
+                        />                        
                     </Box>
                     <Text
                         fontSize='20px'
@@ -325,8 +189,7 @@ export function ComponentPerfil(props){
                                 fontFamily={`'Ubuntu', sans-serif`}
                                 display='flex'
                                 alignItems='flex-start'
-                                justifyContent='flex-start'
-                                
+                                justifyContent='flex-start'  
                             >
                             <ListIcon as={EmailIcon} height='25px' width='auto' color='#2AC28B' margin='0px 20px 0px 0px'/>
                             <Text
@@ -354,8 +217,7 @@ export function ComponentPerfil(props){
                                 >
                                     {`${points.address}, ${points.number}, ${points.district} - ${points.city} / ${points.uf}`}
                                 </Text>
-
-                               </ListItem>
+                            </ListItem>
                         </List>
                         <Box>
                             <Text
@@ -402,7 +264,6 @@ export function ComponentPerfil(props){
                                 _hover={{
                                     background:'#1a653c'
                                 }}
-
                             >
                                 WhatsApp
                             </Button>
@@ -448,12 +309,9 @@ export function ComponentPerfil(props){
                     </Box>
                 </Stack>
             </Center>
-            {/* <ComponentEmail open/> */}
         </Container>
-        
     </>
     )
 }
-
 
 export default ComponentPerfil;
