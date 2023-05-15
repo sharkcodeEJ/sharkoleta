@@ -33,6 +33,8 @@ import {Map,Marker,TileLayer,Popup} from 'react-leaflet';
 import '../../global.css';
 import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
+import sharkcoleta_data from "../../../src/data/sharkcoleta_data.json";
+
 const dadosFake = [
     {
         nome:'Loja Amaral Junior',
@@ -51,13 +53,16 @@ const dadosFake = [
 function ComponentCardsPesquisa({data, onSelected}){
     const [showMessage,setShowMessage] = useState(false);
 
-    const [points, setPoints] = useState([]);
+    //const [points, setPoints] = useState([]);
+    //aqui
+    const points = sharkcoleta_data.Point;
 
-    useEffect(() => {
-        api.get('points', {}).then (response => {
-            setPoints(response.data);
-        })
-    }, [])
+
+    // useEffect(() => {
+    //     api.get('points', {}).then (response => {
+    //         setPoints(response.data);
+    //     })
+    // }, [])
 
     return (
         <>

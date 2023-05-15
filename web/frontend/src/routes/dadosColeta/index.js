@@ -24,6 +24,8 @@ import Email from './imgs/E-mail.svg';
 import REMOVER from './imgs/backgroundREMOVER.svg'
 import SharkcoletaLogo from '../../styles/sharkcoleta_logo.png';
 
+import sharkcoleta_data from "../../../src/data/sharkcoleta_data.json";
+
 export function ComponentPerfil(props){
     const [data, setData] = useState({
         localizacao:{
@@ -73,15 +75,19 @@ export function ComponentPerfil(props){
         getLocationPoint();
     },[])
 
-    const [points, setPoints] = useState([]);
+    //const [points, setPoints] = useState([]);
 
     let urlId = window.location.search.substring(4).split('&');
+    const points = sharkcoleta_data.Point.find((point) => point.id === urlId[0]);
+    const pointItem = sharkcoleta_data.PointItem
+        .filter((point) => point.pointid === urlId[0])
+        .map((item => item.itemId == 1 ? 'Eletrônico' : 'Óleo'));
 
-    useEffect(() => {
-        api.get(`points/${urlId}`, {}).then (response => {
-            setPoints(response.data);
-        })
-    }, [])
+    // useEffect(() => {
+    //     api.get(`points/${urlId}`, {}).then (response => {
+    //         setPoints(response.data);
+    //     })
+    // }, [])
 
     return (
     <>  
@@ -235,14 +241,22 @@ export function ComponentPerfil(props){
                                 padding='40px'
                                 borderRadius='15px'
                             >
-                                <UnorderedList 
-                                    fontFamily={`'Roboto', sans-serif`} 
-                                    spacing='15px'
+                                <Text fontSize='15px'
                                     color='#2AC28B'
-                                    fontSize='15px'
-                                >   
-                                    <ListItem>{points.Image}</ListItem>
-                                </UnorderedList>
+                                    fontFamily={`'Ubuntu', sans-serif`}
+                                    fontWeight='bolder'
+                                    marginBottom='8px'
+                                >
+                                    {`${pointItem[0] ?? ''}`}
+                                </Text>
+                                <Text fontSize='15px' 
+                                    color='#2AC28B'
+                                    fontFamily={`'Ubuntu', sans-serif`}
+                                    fontWeight='bolder'
+                                    marginBottom='8px'
+                                >
+                                    {`${pointItem[1] ?? ''}`}
+                                </Text>
                             </Box>
                         </Box>     
                     </Box>
